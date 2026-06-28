@@ -1,11 +1,38 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { categories, tools } from "./seed-data";
+import { categories, tools, type SeedPricingPlan } from "./seed-data";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+// Ferramentas fictícias do MVP inicial, substituídas pelo catálogo real.
+const LEGACY_DEMO_SLUGS = [
+  "scribeflow-ai",
+  "pixelforge",
+  "clipnova",
+  "codepilot-x",
+  "vocalis",
+  "taskmind",
+];
+
+function defaultPlan(pricingModel: string): SeedPricingPlan {
+  switch (pricingModel) {
+    case "FREE":
+      return { name: "Grátis", priceUsdCents: 0, billingCycle: "monthly", features: [] };
+    case "FREEMIUM":
+      return { name: "Free", priceUsdCents: 0, billingCycle: "monthly", features: ["Plano gratuito disponível"] };
+    case "USAGE_BASED":
+      return { name: "Pay as you go", priceUsdCents: null, billingCycle: "usage", features: [] };
+    case "CONTACT_SALES":
+      return { name: "Enterprise", priceUsdCents: null, billingCycle: null, features: [] };
+    default:
+      return { name: "Pago", priceUsdCents: null, billingCycle: "monthly", features: [] };
+  }
+}
+
 async function main() {
+  await prisma.tool.deleteMany({ where: { slug: { in: LEGACY_DEMO_SLUGS } } });
+
   const categoryIdBySlug = new Map<string, string>();
 
   for (const category of categories) {
@@ -23,7 +50,10 @@ async function main() {
 
   for (const tool of tools) {
     const categoryId = categoryIdBySlug.get(tool.categorySlug);
-    if (!categoryId) continue;
+    if (!categoryId) {
+      console.warn(`Categoria não encontrada para ${tool.slug}: ${tool.categorySlug}`);
+      continue;
+    }
 
     const createdTool = await prisma.tool.upsert({
       where: { slug: tool.slug },
@@ -46,7 +76,7 @@ async function main() {
       },
     });
 
-    for (const tagName of tool.tags) {
+    for (const tagName of tool.tags ?? []) {
       const slug = tagName.toLowerCase().replace(/\s+/g, "-");
       const tag = await prisma.tag.upsert({
         where: { slug },
@@ -60,7 +90,9 @@ async function main() {
       });
     }
 
-    for (const plan of tool.pricingPlans) {
+    const plans = tool.pricingPlans?.length ? tool.pricingPlans : [defaultPlan(tool.pricingModel)];
+    await prisma.pricingPlan.deleteMany({ where: { toolId: createdTool.id } });
+    for (const plan of plans) {
       await prisma.pricingPlan.create({
         data: {
           toolId: createdTool.id,
