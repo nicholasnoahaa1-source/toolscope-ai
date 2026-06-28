@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PricingModel {
+  FREE
+  FREEMIUM
+  PAID
+  USAGE_BASED
+  CONTACT_SALES
+}
+
+enum ToolStatus {
+  ACTIVE
+  BETA
+  DEPRECATED
+  ACQUIRED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  FLAGGED
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  parentId    String?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryHierarchy")
+  tools       Tool[]
+  createdAt   DateTime   @default(now())
+
+  @@index([parentId])
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String    @unique
+  slug  String    @unique
+  tools ToolTag[]
+}
+
+model Tool {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  name            String
+  tagline         String
+  description     String
+  websiteUrl      String
+  logoUrl         String?
+  pricingModel    PricingModel  @default(FREEMIUM)
+  status          ToolStatus    @default(ACTIVE)
+  foundedYear     Int?
+  complianceScore Int? // 0-100, calculado a partir de critérios de segurança/compliance
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  tags            ToolTag[]
+  pricingPlans    PricingPlan[]
+  reviews         Review[]
+  benchmarks      Benchmark[]
+  favorites       Favorite[]
+  workflowSteps   WorkflowTool[]
+  collections     CollectionTool[]
+  embedding       ToolEmbedding?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([categoryId, status])
+  @@index([name])
+}
+
+model ToolTag {
+  toolId String
+  tagId  String
+  tool   Tool   @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([toolId, tagId])
+}
+
+model PricingPlan {
+  id            String   @id @default(cuid())
+  toolId        String
+  tool          Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  name          String
+  priceUsdCents Int? // null = "contate vendas" / customizado
+  billingCycle  String? // monthly | yearly | one_time | usage
+  featuresJson  Json?
+  createdAt     DateTime @default(now())
+
+  @@index([toolId])
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  plan        String       @default("free") // free | pro | enterprise
+  reviews     Review[]
+  favorites   Favorite[]
+  collections Collection[]
+  createdAt   DateTime     @default(now())
+}
+
+model Review {
+  id          String       @id @default(cuid())
+  toolId      String
+  tool        Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int // 1-5
+  title       String
+  body        String
+  status      ReviewStatus @default(PENDING)
+  helpfulCount Int         @default(0)
+  createdAt   DateTime     @default(now())
+
+  @@index([toolId, status])
+}
+
+model Benchmark {
+  id             String   @id @default(cuid())
+  toolId         String
+  tool           Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  taskType       String // ex: "summarization", "code-fix", "image-gen"
+  prompt         String
+  outputRef      String? // URL/path para o output armazenado
+  latencyMs      Int?
+  costUsdCents   Int?
+  qualityScore   Int? // 0-100, atribuído pelo avaliador
+  evaluatorModel String?
+  runAt          DateTime @default(now())
+
+  @@index([toolId, taskType])
+}
+
+model Favorite {
+  userId    String
+  toolId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, toolId])
+}
+
+model Collection {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  isPublic  Boolean          @default(false)
+  tools     CollectionTool[]
+  createdAt DateTime         @default(now())
+}
+
+model CollectionTool {
+  collectionId String
+  toolId       String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  tool         Tool       @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, toolId])
+}
+
+model Workflow {
+  id          String         @id @default(cuid())
+  title       String
+  slug        String         @unique
+  description String
+  steps       WorkflowTool[]
+  createdAt   DateTime       @default(now())
+}
+
+model WorkflowTool {
+  workflowId String
+  toolId     String
+  stepOrder  Int
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  tool       Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@id([workflowId, toolId])
+}
+
+model ToolEmbedding {
+  toolId      String   @id
+  tool        Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  contentHash String
+  updatedAt   DateTime @updatedAt
+  // O vetor em si fica em uma coluna pgvector adicionada via migration raw SQL
+  // (Prisma ainda não modela `vector` nativamente neste schema).
+}
