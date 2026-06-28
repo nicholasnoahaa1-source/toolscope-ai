@@ -1,9 +1,8 @@
 import Link from "next/link";
 import type { Tool } from "@/lib/types";
-import { categories, formatPrice } from "@/lib/mock-data";
+import { formatPrice } from "@/lib/data";
 
 export default function ToolCard({ tool }: { tool: Tool }) {
-  const category = categories.find((c) => c.slug === tool.categorySlug);
   const cheapestPaid = tool.pricingPlans.find((p) => (p.priceUsdCents ?? 0) > 0);
 
   return (
@@ -17,7 +16,7 @@ export default function ToolCard({ tool }: { tool: Tool }) {
         </span>
         <div>
           <h3 className="font-semibold text-foreground group-hover:text-brand">{tool.name}</h3>
-          {category && <span className="text-xs text-muted">{category.name}</span>}
+          <span className="text-xs text-muted">{tool.categoryName}</span>
         </div>
       </div>
 

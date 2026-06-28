@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { categories } from "@/lib/mock-data";
+import { getCategories } from "@/lib/data";
 
-export default function Header() {
+export default async function Header() {
+  const categories = await getCategories();
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-8 px-6 py-4">

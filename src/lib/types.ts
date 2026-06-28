@@ -31,6 +31,7 @@ export type Tool = {
   logoInitial: string;
   pricingModel: PricingModel;
   categorySlug: string;
+  categoryName: string;
   tags: string[];
   pricingPlans: PricingPlan[];
   reviews: ReviewSummary[];

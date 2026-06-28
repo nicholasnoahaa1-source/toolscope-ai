@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { categories, formatPrice, tools } from "@/lib/mock-data";
+import { formatPrice, getAllTools } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Comparador de ferramentas de IA",
@@ -27,6 +27,7 @@ export default async function ComparePage({
 }) {
   const { tools: toolsParam } = await searchParams;
   const selectedSlugs = parseSlugs(toolsParam);
+  const tools = await getAllTools();
   const selectedTools = tools.filter((t) => selectedSlugs.includes(t.slug));
 
   return (
@@ -78,7 +79,7 @@ export default async function ComparePage({
                 <td className="border-b border-border py-3 text-muted">Categoria</td>
                 {selectedTools.map((tool) => (
                   <td key={tool.slug} className="border-b border-border py-3">
-                    {categories.find((c) => c.slug === tool.categorySlug)?.name}
+                    {tool.categoryName}
                   </td>
                 ))}
               </tr>

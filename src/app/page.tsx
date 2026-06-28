@@ -1,6 +1,6 @@
 import Link from "next/link";
 import ToolCard from "@/components/ToolCard";
-import { categories, searchTools, tools } from "@/lib/mock-data";
+import { getCategories, searchTools } from "@/lib/data";
 
 export default async function Home({
   searchParams,
@@ -8,7 +8,7 @@ export default async function Home({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
-  const results = searchTools(q ?? "");
+  const [results, categories] = await Promise.all([searchTools(q ?? ""), getCategories()]);
   const isSearching = Boolean(q && q.trim());
 
   return (
@@ -75,7 +75,7 @@ export default async function Home({
 
       {!isSearching && (
         <section className="mx-auto max-w-7xl px-6 pb-16 text-sm text-muted">
-          Catálogo total no MVP: {tools.length} ferramentas (dados de demonstração).
+          Catálogo total no MVP: {results.length} ferramentas.
         </section>
       )}
     </div>

@@ -2,9 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ToolCard from "@/components/ToolCard";
-import { categories, getCategoryBySlug, getToolsByCategory } from "@/lib/mock-data";
+import { getCategories, getCategoryBySlug, getToolsByCategory } from "@/lib/data";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const categories = await getCategories();
   return categories.map((category) => ({ slug: category.slug }));
 }
 
@@ -14,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) return {};
   return {
     title: `Melhores ferramentas de IA para ${category.name}`,
@@ -28,10 +29,12 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const [category, categoryTools, categories] = await Promise.all([
+    getCategoryBySlug(slug),
+    getToolsByCategory(slug),
+    getCategories(),
+  ]);
   if (!category) notFound();
-
-  const categoryTools = getToolsByCategory(slug);
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-10">

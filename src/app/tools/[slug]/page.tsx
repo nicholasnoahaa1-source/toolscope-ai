@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { categories, formatPrice, getToolBySlug, tools } from "@/lib/mock-data";
+import { formatPrice, getToolBySlug } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const tools = await prisma.tool.findMany({ select: { slug: true } });
   return tools.map((tool) => ({ slug: tool.slug }));
 }
 
@@ -13,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const tool = await getToolBySlug(slug);
   if (!tool) return {};
   return {
     title: `${tool.name} — preço, reviews e alternativas`,
@@ -27,24 +29,18 @@ export default async function ToolPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const tool = getToolBySlug(slug);
+  const tool = await getToolBySlug(slug);
   if (!tool) notFound();
-
-  const category = categories.find((c) => c.slug === tool.categorySlug);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <nav className="mb-6 text-sm text-muted">
         <Link href="/" className="hover:text-brand">Início</Link>
         {" / "}
-        {category && (
-          <>
-            <Link href={`/categories/${category.slug}`} className="hover:text-brand">
-              {category.name}
-            </Link>
-            {" / "}
-          </>
-        )}
+        <Link href={`/categories/${tool.categorySlug}`} className="hover:text-brand">
+          {tool.categoryName}
+        </Link>
+        {" / "}
         <span className="text-foreground">{tool.name}</span>
       </nav>
 
