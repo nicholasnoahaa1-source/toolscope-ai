@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sala Virtual Senac
 
-## Getting Started
+Plataforma de turmas, atividades, entregas e materiais de aula — um espaço simples
+para professores e alunos, inspirado no Teams/Campus Digital Senac/AVA.
 
-First, run the development server:
+## Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Login com papéis (Aluno, Professor, Admin)
+- Professores criam turmas e compartilham um código de acesso
+- Alunos entram em turmas usando o código
+- Atividades com prazo, anexos e envio de entregas em arquivo
+- Avaliação de entregas com nota (0–10) e feedback
+- Materiais de aula (arquivo ou link) e mural de avisos por turma
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Rodando localmente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copie `.env.example` para `.env` e preencha `DATABASE_URL` (Postgres/Neon) e `SESSION_SECRET`.
+2. Instale as dependências: `npm install`
+3. Aplique as migrações: `npx prisma migrate deploy` (ou `npx prisma migrate dev` em desenvolvimento)
+4. Popule dados de exemplo: `npx prisma db seed`
+5. Inicie o servidor: `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Contas de exemplo criadas pelo seed (senha `senac123` para todas):
 
-## Learn More
+- `admin@senac.br` — Admin
+- `professor@senac.br` — Professor (turma com código `SENAC1`)
+- `aluno1@senac.br`, `aluno2@senac.br`, `aluno3@senac.br` — Alunos
 
-To learn more about Next.js, take a look at the following resources:
+## Identidade visual
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+As cores e a tipografia em `src/app/globals.css` são uma aproximação da
+identidade do Senac (vermelho institucional, tipografia Helvetica Neue/Arial).
+Ajuste os valores conforme o manual de marca oficial da sua unidade, e troque
+o `Logo` em `src/components/senac/Logo.tsx` pela logomarca oficial (arquivo
+SVG/PNG) assim que estiver disponível.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Armazenamento de arquivos
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Nesta versão, arquivos enviados (materiais e entregas) são salvos localmente
+na pasta `uploads/` e servidos por uma rota autenticada
+(`/api/arquivos/[id]`). Para produção, considere migrar para um storage
+externo (S3, R2, Vercel Blob etc.).

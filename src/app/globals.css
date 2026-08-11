@@ -1,13 +1,34 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8fb;
-  --foreground: #14152b;
-  --brand: #5b4cff;
-  --brand-dark: #3f2fd6;
-  --surface: #ffffff;
-  --border: #e6e7f0;
-  --muted: #6b6e85;
+  /*
+   * Paleta aproximada da identidade visual do Senac (vermelho institucional
+   * predominante, neutros em cinza/preto). Ajuste os valores hexadecimais
+   * abaixo caso tenha acesso ao manual de marca oficial com os códigos
+   * exatos (Pantone/CMYK/RGB) da sua unidade/regional.
+   */
+  --senac-red: #e4002b;
+  --senac-red-dark: #b4001f;
+  --senac-red-light: #fdecef;
+  --senac-black: #1a1a1a;
+  --senac-gray: #58595b;
+  --senac-gray-light: #f4f4f5;
+  --senac-border: #e5e5e8;
+  --senac-white: #ffffff;
+
+  --background: var(--senac-white);
+  --foreground: var(--senac-black);
+  --brand: var(--senac-red);
+  --brand-dark: var(--senac-red-dark);
+  --brand-light: var(--senac-red-light);
+  --surface: var(--senac-white);
+  --border: var(--senac-border);
+  --muted: var(--senac-gray);
+  --surface-muted: var(--senac-gray-light);
+
+  /* Manual do Senac indica Helvetica Neue para material institucional e
+     Arial/Verdana como alternativa para meios eletrônicos. */
+  --font-institucional: "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
 }
 
 @theme inline {
@@ -15,15 +36,16 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
   --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
   --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-institucional);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
