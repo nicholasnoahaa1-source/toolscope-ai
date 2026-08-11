@@ -28,16 +28,19 @@ Contas de exemplo criadas pelo seed (senha `senac123` para todas):
 
 ## Identidade visual
 
-As cores (azul-marinho + laranja) e a tipografia em `src/app/globals.css`
-foram definidas com base em páginas do "Manual da Marca e da Identidade
-Visual do Senac" (tipografia institucional em Helvetica Neue LT Pro, restrita
-a material impresso; para meios eletrônicos o manual indica Verdana/Arial,
-usados aqui). Os hex exatos da marca (`--senac-blue`, `--senac-orange`) foram
-estimados visualmente a partir da logo, já que a página de códigos
-Pantone/CMYK/RGB não foi conferida — troque pelos valores exatos se tiver
-acesso a ela. O `Logo` em `src/components/senac/Logo.tsx` é uma reconstrução
-aproximada do ícone + wordmark; troque pelo arquivo SVG/PNG oficial assim que
-disponível.
+As cores e a tipografia em `src/app/globals.css` seguem o "Manual da Marca e
+da Identidade Visual do Senac":
+
+- **Azul Senac** — Pantone 288 C — `#004A8D`
+- **Laranja Senac** — Pantone 144 C — `#F7941D`
+- **Laranja-claro** — Pantone 144 55% — `#FDC180`
+- Tipografia institucional (impressos): Helvetica Neue LT Pro
+- Tipografia para meios eletrônicos (usada neste site): Verdana/Arial
+
+O `Logo` em `src/components/senac/Logo.tsx` é uma reconstrução aproximada do
+ícone (bandeira azul + laranja) e do wordmark — não é o arquivo vetorial
+oficial. Troque por `<img src="/logo-senac.svg" .../>` com o SVG oficial
+assim que disponível.
 
 ## Armazenamento de arquivos
 

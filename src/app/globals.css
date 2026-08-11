@@ -2,18 +2,17 @@
 
 :root {
   /*
-   * Paleta baseada em fotos das páginas de tipografia/logo do "Manual da
-   * Marca e da Identidade Visual do Senac" (azul-marinho + laranja na
-   * marca; a página de códigos Pantone/CMYK/RGB de cores não foi
-   * fotografada). Os hex abaixo foram estimados visualmente a partir da
-   * logo — troque por --senac-blue/--senac-orange exatos se você tiver a
-   * página "CORES" do manual.
+   * Cromias institucionais do Senac, conforme a página "CORES" do manual
+   * de marca (Escala Pantone / Web Safe):
+   *  - Azul Senac:      Pantone 288 C   — #004A8D
+   *  - Laranja Senac:   Pantone 144 C   — #F7941D
+   *  - Laranja-claro:   Pantone 144 55% — #FDC180
    */
-  --senac-blue: #163a74;
-  --senac-blue-dark: #0f2850;
-  --senac-blue-light: #eaf0fb;
-  --senac-orange: #f6921e;
-  --senac-orange-light: #ffb35c;
+  --senac-blue: #004a8d;
+  --senac-blue-dark: #00376a;
+  --senac-blue-light: #eaf1f8;
+  --senac-orange: #f7941d;
+  --senac-orange-light: #fdc180;
   --senac-black: #1a1a1a;
   --senac-gray: #58595b;
   --senac-gray-light: #f4f4f5;
@@ -28,7 +27,7 @@
   --brand-dark: var(--senac-blue-dark);
   --brand-light: var(--senac-blue-light);
   --accent: var(--senac-orange);
-  --accent-dark: var(--senac-orange-light);
+  --accent-light: var(--senac-orange-light);
   --surface: var(--senac-white);
   --border: var(--senac-border);
   --muted: var(--senac-gray);
@@ -52,7 +51,7 @@
   --color-brand-dark: var(--brand-dark);
   --color-brand-light: var(--brand-light);
   --color-accent: var(--accent);
-  --color-accent-dark: var(--accent-dark);
+  --color-accent-light: var(--accent-light);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
