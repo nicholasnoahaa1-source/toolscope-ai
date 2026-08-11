@@ -37,10 +37,9 @@ da Identidade Visual do Senac":
 - Tipografia institucional (impressos): Helvetica Neue LT Pro
 - Tipografia para meios eletrônicos (usada neste site): Verdana/Arial
 
-O `Logo` em `src/components/senac/Logo.tsx` é uma reconstrução aproximada do
-ícone (bandeira azul + laranja) e do wordmark — não é o arquivo vetorial
-oficial. Troque por `<img src="/logo-senac.svg" .../>` com o SVG oficial
-assim que disponível.
+A logomarca oficial está em `public/logo-senac.png`, usada pelo componente
+`src/components/senac/Logo.tsx`. Se depois você tiver a versão vetorial
+(SVG), é só substituir o arquivo mantendo o mesmo nome/caminho.
 
 ## Armazenamento de arquivos
 
