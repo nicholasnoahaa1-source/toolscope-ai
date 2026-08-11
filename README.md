@@ -14,7 +14,7 @@ para professores e alunos, inspirado no Teams/Campus Digital Senac/AVA.
 
 ## Rodando localmente
 
-1. Copie `.env.example` para `.env` e preencha `DATABASE_URL` (Postgres/Neon) e `SESSION_SECRET`.
+1. Copie `.env.example` para `.env` e preencha `DATABASE_URL`, `SESSION_SECRET`, `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
 2. Instale as dependências: `npm install`
 3. Aplique as migrações: `npx prisma migrate deploy` (ou `npx prisma migrate dev` em desenvolvimento)
 4. Popule dados de exemplo: `npx prisma db seed`
@@ -43,7 +43,26 @@ A logomarca oficial está em `public/logo-senac.png`, usada pelo componente
 
 ## Armazenamento de arquivos
 
-Nesta versão, arquivos enviados (materiais e entregas) são salvos localmente
-na pasta `uploads/` e servidos por uma rota autenticada
-(`/api/arquivos/[id]`). Para produção, considere migrar para um storage
-externo (S3, R2, Vercel Blob etc.).
+Arquivos enviados (materiais e entregas) são salvos em um bucket privado do
+Supabase Storage (`arquivos`) via `src/lib/files.ts`, usando a chave
+`service_role` (só em código de servidor). O download passa por uma rota
+autenticada (`/api/arquivos/[id]`) que confere se o usuário pertence à
+turma antes de servir o arquivo.
+
+## Deploy (produção)
+
+- **Banco de dados**: projeto Supabase dedicado (`senac-sala-virtual`),
+  com as migrações do Prisma aplicadas e dados de exemplo já semeados.
+- **Storage**: bucket privado `arquivos` já criado no mesmo projeto.
+- **Hospedagem**: Vercel, projeto `senac-sala-virtual`.
+
+Variáveis de ambiente que precisam ser configuradas no painel do Vercel
+(Project Settings > Environment Variables) — não são definidas
+automaticamente pelo deploy:
+
+- `DATABASE_URL` — connection string do Postgres (Supabase > Project
+  Settings > Database > Connection string, modo "Transaction pooler")
+- `SESSION_SECRET` — chave aleatória para assinar os cookies de sessão
+- `SUPABASE_URL` — URL do projeto Supabase
+- `SUPABASE_SERVICE_ROLE_KEY` — chave `service_role` do projeto (Project
+  Settings > API)
