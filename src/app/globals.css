@@ -2,33 +2,47 @@
 
 :root {
   /*
-   * Paleta aproximada da identidade visual do Senac (vermelho institucional
-   * predominante, neutros em cinza/preto). Ajuste os valores hexadecimais
-   * abaixo caso tenha acesso ao manual de marca oficial com os códigos
-   * exatos (Pantone/CMYK/RGB) da sua unidade/regional.
+   * Paleta baseada em fotos das páginas de tipografia/logo do "Manual da
+   * Marca e da Identidade Visual do Senac" (azul-marinho + laranja na
+   * marca; a página de códigos Pantone/CMYK/RGB de cores não foi
+   * fotografada). Os hex abaixo foram estimados visualmente a partir da
+   * logo — troque por --senac-blue/--senac-orange exatos se você tiver a
+   * página "CORES" do manual.
    */
-  --senac-red: #e4002b;
-  --senac-red-dark: #b4001f;
-  --senac-red-light: #fdecef;
+  --senac-blue: #163a74;
+  --senac-blue-dark: #0f2850;
+  --senac-blue-light: #eaf0fb;
+  --senac-orange: #f6921e;
+  --senac-orange-light: #ffb35c;
   --senac-black: #1a1a1a;
   --senac-gray: #58595b;
   --senac-gray-light: #f4f4f5;
   --senac-border: #e5e5e8;
   --senac-white: #ffffff;
+  --senac-danger: #dc2626;
+  --senac-danger-light: #fef2f2;
 
   --background: var(--senac-white);
   --foreground: var(--senac-black);
-  --brand: var(--senac-red);
-  --brand-dark: var(--senac-red-dark);
-  --brand-light: var(--senac-red-light);
+  --brand: var(--senac-blue);
+  --brand-dark: var(--senac-blue-dark);
+  --brand-light: var(--senac-blue-light);
+  --accent: var(--senac-orange);
+  --accent-dark: var(--senac-orange-light);
   --surface: var(--senac-white);
   --border: var(--senac-border);
   --muted: var(--senac-gray);
   --surface-muted: var(--senac-gray-light);
+  --danger: var(--senac-danger);
+  --danger-light: var(--senac-danger-light);
 
-  /* Manual do Senac indica Helvetica Neue para material institucional e
-     Arial/Verdana como alternativa para meios eletrônicos. */
-  --font-institucional: "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+  /*
+   * Manual do Senac: Helvetica Neue LT Pro é reservada a material
+   * institucional impresso (diplomas, certificados, documentos). Para
+   * "meios eletrônicos" o manual indica explicitamente Verdana e Arial —
+   * é a regra aplicável a este site.
+   */
+  --font-institucional: Verdana, Arial, Helvetica, sans-serif;
 }
 
 @theme inline {
@@ -37,10 +51,14 @@
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
   --color-brand-light: var(--brand-light);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
   --color-muted: var(--muted);
+  --color-danger: var(--danger);
+  --color-danger-light: var(--danger-light);
   --font-sans: var(--font-institucional);
 }
 
