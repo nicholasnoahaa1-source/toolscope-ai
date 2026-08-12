@@ -8,6 +8,7 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur">
+      <div className="h-1 bg-gradient-to-r from-brand to-accent" />
       <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-4">
         <Link href={session ? "/dashboard" : "/"} className="shrink-0">
           <Logo />

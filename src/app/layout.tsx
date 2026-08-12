@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   },
   description:
     "Plataforma de turmas, atividades, entregas e materiais de aula para alunos e professores do Senac.",
+  icons: {
+    icon: "/logo-senac.png",
+  },
 };
 
 export default function RootLayout({
