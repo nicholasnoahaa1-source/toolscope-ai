@@ -7,195 +7,156 @@ datasource db {
   provider = "postgresql"
 }
 
-enum PricingModel {
-  FREE
-  FREEMIUM
-  PAID
-  USAGE_BASED
-  CONTACT_SALES
+enum Role {
+  ALUNO
+  PROFESSOR
+  ADMIN
 }
 
-enum ToolStatus {
-  ACTIVE
-  BETA
-  DEPRECATED
-  ACQUIRED
+enum StatusEntrega {
+  PENDENTE
+  ENTREGUE
+  ATRASADA
+  AVALIADA
 }
 
-enum ReviewStatus {
-  PENDING
-  APPROVED
-  FLAGGED
-}
-
-model Category {
-  id          String     @id @default(cuid())
-  name        String
-  slug        String     @unique
-  description String?
-  parentId    String?
-  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children    Category[] @relation("CategoryHierarchy")
-  tools       Tool[]
-  createdAt   DateTime   @default(now())
-
-  @@index([parentId])
-}
-
-model Tag {
-  id    String    @id @default(cuid())
-  name  String    @unique
-  slug  String    @unique
-  tools ToolTag[]
-}
-
-model Tool {
-  id              String        @id @default(cuid())
-  slug            String        @unique
-  name            String
-  tagline         String
-  description     String
-  websiteUrl      String
-  logoUrl         String?
-  pricingModel    PricingModel  @default(FREEMIUM)
-  status          ToolStatus    @default(ACTIVE)
-  foundedYear     Int?
-  complianceScore Int? // 0-100, calculado a partir de critérios de segurança/compliance
-  categoryId      String
-  category        Category      @relation(fields: [categoryId], references: [id])
-  tags            ToolTag[]
-  pricingPlans    PricingPlan[]
-  reviews         Review[]
-  benchmarks      Benchmark[]
-  favorites       Favorite[]
-  workflowSteps   WorkflowTool[]
-  collections     CollectionTool[]
-  embedding       ToolEmbedding?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([categoryId, status])
-  @@index([name])
-}
-
-model ToolTag {
-  toolId String
-  tagId  String
-  tool   Tool   @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([toolId, tagId])
-}
-
-model PricingPlan {
-  id            String   @id @default(cuid())
-  toolId        String
-  tool          Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  name          String
-  priceUsdCents Int? // null = "contate vendas" / customizado
-  billingCycle  String? // monthly | yearly | one_time | usage
-  featuresJson  Json?
-  createdAt     DateTime @default(now())
-
-  @@index([toolId])
+enum TipoMaterial {
+  ARQUIVO
+  LINK
 }
 
 model User {
-  id          String       @id @default(cuid())
-  email       String       @unique
-  name        String?
-  plan        String       @default("free") // free | pro | enterprise
-  reviews     Review[]
-  favorites   Favorite[]
-  collections Collection[]
-  createdAt   DateTime     @default(now())
+  id            String        @id @default(cuid())
+  name          String
+  email         String        @unique
+  passwordHash  String
+  role          Role          @default(ALUNO)
+  createdAt     DateTime      @default(now())
+
+  turmasLecionadas Turma[]      @relation("Professor")
+  matriculas       Matricula[]
+  atividadesCriadas Atividade[] @relation("AutorAtividade")
+  entregas         Entrega[]
+  materiaisCriados Material[]   @relation("AutorMaterial")
+  avisosCriados    Aviso[]      @relation("AutorAviso")
+  arquivosEnviados Arquivo[]
+
+  @@index([email])
 }
 
-model Review {
-  id          String       @id @default(cuid())
-  toolId      String
-  tool        Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  userId      String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  rating      Int // 1-5
-  title       String
-  body        String
-  status      ReviewStatus @default(PENDING)
-  helpfulCount Int         @default(0)
-  createdAt   DateTime     @default(now())
+model Turma {
+  id          String   @id @default(cuid())
+  nome        String
+  descricao   String?
+  codigo      String   @unique
+  professorId String
+  professor   User     @relation("Professor", fields: [professorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 
-  @@index([toolId, status])
+  matriculas  Matricula[]
+  atividades  Atividade[]
+  materiais   Material[]
+  avisos      Aviso[]
+
+  @@index([professorId])
 }
 
-model Benchmark {
-  id             String   @id @default(cuid())
-  toolId         String
-  tool           Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  taskType       String // ex: "summarization", "code-fix", "image-gen"
-  prompt         String
-  outputRef      String? // URL/path para o output armazenado
-  latencyMs      Int?
-  costUsdCents   Int?
-  qualityScore   Int? // 0-100, atribuído pelo avaliador
-  evaluatorModel String?
-  runAt          DateTime @default(now())
-
-  @@index([toolId, taskType])
-}
-
-model Favorite {
-  userId    String
-  toolId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+model Matricula {
+  id        String   @id @default(cuid())
+  turmaId   String
+  alunoId   String
+  turma     Turma    @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  aluno     User     @relation(fields: [alunoId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
-  @@id([userId, toolId])
+  @@unique([turmaId, alunoId])
+  @@index([alunoId])
 }
 
-model Collection {
-  id        String           @id @default(cuid())
-  userId    String
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
-  isPublic  Boolean          @default(false)
-  tools     CollectionTool[]
-  createdAt DateTime         @default(now())
+model Atividade {
+  id          String    @id @default(cuid())
+  turmaId     String
+  turma       Turma     @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  autorId     String
+  autor       User      @relation("AutorAtividade", fields: [autorId], references: [id])
+  titulo      String
+  descricao   String
+  prazo       DateTime?
+  createdAt   DateTime  @default(now())
+
+  anexos      Arquivo[]  @relation("AnexoAtividade")
+  entregas    Entrega[]
+
+  @@index([turmaId])
 }
 
-model CollectionTool {
-  collectionId String
-  toolId       String
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  tool         Tool       @relation(fields: [toolId], references: [id], onDelete: Cascade)
+model Entrega {
+  id          String        @id @default(cuid())
+  atividadeId String
+  atividade   Atividade     @relation(fields: [atividadeId], references: [id], onDelete: Cascade)
+  alunoId     String
+  aluno       User          @relation(fields: [alunoId], references: [id], onDelete: Cascade)
+  comentario  String?
+  status      StatusEntrega @default(PENDENTE)
+  nota        Float?
+  feedback    String?
+  enviadaEm   DateTime?
+  avaliadaEm  DateTime?
+  createdAt   DateTime      @default(now())
 
-  @@id([collectionId, toolId])
+  arquivos    Arquivo[]     @relation("AnexoEntrega")
+
+  @@unique([atividadeId, alunoId])
+  @@index([alunoId])
 }
 
-model Workflow {
-  id          String         @id @default(cuid())
-  title       String
-  slug        String         @unique
-  description String
-  steps       WorkflowTool[]
-  createdAt   DateTime       @default(now())
+model Material {
+  id        String       @id @default(cuid())
+  turmaId   String
+  turma     Turma        @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  autorId   String
+  autor     User         @relation("AutorMaterial", fields: [autorId], references: [id])
+  titulo    String
+  tipo      TipoMaterial @default(ARQUIVO)
+  url       String?
+  createdAt DateTime     @default(now())
+
+  arquivos  Arquivo[]    @relation("AnexoMaterial")
+
+  @@index([turmaId])
 }
 
-model WorkflowTool {
-  workflowId String
-  toolId     String
-  stepOrder  Int
-  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
-  tool       Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+model Aviso {
+  id        String   @id @default(cuid())
+  turmaId   String
+  turma     Turma    @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  autorId   String
+  autor     User     @relation("AutorAviso", fields: [autorId], references: [id])
+  titulo    String
+  conteudo  String
+  createdAt DateTime @default(now())
 
-  @@id([workflowId, toolId])
+  @@index([turmaId])
 }
 
-model ToolEmbedding {
-  toolId      String   @id
-  tool        Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
-  contentHash String
-  updatedAt   DateTime @updatedAt
-  // O vetor em si fica em uma coluna pgvector adicionada via migration raw SQL
-  // (Prisma ainda não modela `vector` nativamente neste schema).
+model Arquivo {
+  id           String   @id @default(cuid())
+  nomeOriginal String
+  caminho      String
+  mimeType     String
+  tamanho      Int
+  enviadoPorId String
+  enviadoPor   User     @relation(fields: [enviadoPorId], references: [id])
+  createdAt    DateTime @default(now())
+
+  atividadeId  String?
+  atividade    Atividade? @relation("AnexoAtividade", fields: [atividadeId], references: [id], onDelete: Cascade)
+  entregaId    String?
+  entrega      Entrega?   @relation("AnexoEntrega", fields: [entregaId], references: [id], onDelete: Cascade)
+  materialId   String?
+  material     Material?  @relation("AnexoMaterial", fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@index([atividadeId])
+  @@index([entregaId])
+  @@index([materialId])
 }

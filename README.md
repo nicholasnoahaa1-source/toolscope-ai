@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sala Virtual Senac
 
-## Getting Started
+Plataforma de turmas, atividades, entregas e materiais de aula — um espaço simples
+para professores e alunos, inspirado no Teams/Campus Digital Senac/AVA.
 
-First, run the development server:
+## Funcionalidades
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Login com papéis (Aluno, Professor, Admin)
+- Professores criam turmas e compartilham um código de acesso
+- Alunos entram em turmas usando o código
+- Atividades com prazo, anexos e envio de entregas em arquivo
+- Avaliação de entregas com nota (0–10) e feedback
+- Materiais de aula (arquivo ou link) e mural de avisos por turma
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Rodando localmente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copie `.env.example` para `.env` e preencha `DATABASE_URL`, `SESSION_SECRET`, `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+2. Instale as dependências: `npm install`
+3. Aplique as migrações: `npx prisma migrate deploy` (ou `npx prisma migrate dev` em desenvolvimento)
+4. Popule dados de exemplo: `npx prisma db seed`
+5. Inicie o servidor: `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Contas de exemplo criadas pelo seed (senha `senac123` para todas):
 
-## Learn More
+- `admin@senac.br` — Admin
+- `professor@senac.br` — Professor (turma com código `SENAC1`)
+- `aluno1@senac.br`, `aluno2@senac.br`, `aluno3@senac.br` — Alunos
 
-To learn more about Next.js, take a look at the following resources:
+## Identidade visual
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+As cores e a tipografia em `src/app/globals.css` seguem o "Manual da Marca e
+da Identidade Visual do Senac":
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Azul Senac** — Pantone 288 C — `#004A8D`
+- **Laranja Senac** — Pantone 144 C — `#F7941D`
+- **Laranja-claro** — Pantone 144 55% — `#FDC180`
+- Tipografia institucional (impressos): Helvetica Neue LT Pro
+- Tipografia para meios eletrônicos (usada neste site): Verdana/Arial
 
-## Deploy on Vercel
+A logomarca oficial está em `public/logo-senac.png`, usada pelo componente
+`src/components/senac/Logo.tsx`. Se depois você tiver a versão vetorial
+(SVG), é só substituir o arquivo mantendo o mesmo nome/caminho.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Armazenamento de arquivos
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Arquivos enviados (materiais e entregas) são salvos em um bucket privado do
+Supabase Storage (`arquivos`) via `src/lib/files.ts`, usando a chave
+`service_role` (só em código de servidor). O download passa por uma rota
+autenticada (`/api/arquivos/[id]`) que confere se o usuário pertence à
+turma antes de servir o arquivo.
+
+## Deploy (produção)
+
+- **Banco de dados**: projeto Supabase dedicado (`senac-sala-virtual`),
+  com as migrações do Prisma aplicadas e dados de exemplo já semeados.
+- **Storage**: bucket privado `arquivos` já criado no mesmo projeto.
+- **Hospedagem**: Vercel, projeto `senac-sala-virtual`.
+
+Variáveis de ambiente que precisam ser configuradas no painel do Vercel
+(Project Settings > Environment Variables) — não são definidas
+automaticamente pelo deploy:
+
+- `DATABASE_URL` — connection string do Postgres (Supabase > Project
+  Settings > Database > Connection string, modo "Transaction pooler")
+- `SESSION_SECRET` — chave aleatória para assinar os cookies de sessão
+- `SUPABASE_URL` — URL do projeto Supabase
+- `SUPABASE_SERVICE_ROLE_KEY` — chave `service_role` do projeto (Project
+  Settings > API)

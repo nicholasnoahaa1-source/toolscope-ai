@@ -1,13 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8fb;
-  --foreground: #14152b;
-  --brand: #5b4cff;
-  --brand-dark: #3f2fd6;
-  --surface: #ffffff;
-  --border: #e6e7f0;
-  --muted: #6b6e85;
+  /*
+   * Cromias institucionais do Senac, conforme a página "CORES" do manual
+   * de marca (Escala Pantone / Web Safe):
+   *  - Azul Senac:      Pantone 288 C   — #004A8D
+   *  - Laranja Senac:   Pantone 144 C   — #F7941D
+   *  - Laranja-claro:   Pantone 144 55% — #FDC180
+   */
+  --senac-blue: #004a8d;
+  --senac-blue-dark: #00376a;
+  --senac-blue-light: #eaf1f8;
+  --senac-orange: #f7941d;
+  --senac-orange-light: #fdc180;
+  --senac-black: #1a1a1a;
+  --senac-gray: #58595b;
+  --senac-gray-light: #f4f4f5;
+  --senac-border: #e5e5e8;
+  --senac-white: #ffffff;
+  --senac-danger: #dc2626;
+  --senac-danger-light: #fef2f2;
+
+  --background: var(--senac-white);
+  --foreground: var(--senac-black);
+  --brand: var(--senac-blue);
+  --brand-dark: var(--senac-blue-dark);
+  --brand-light: var(--senac-blue-light);
+  --accent: var(--senac-orange);
+  --accent-light: var(--senac-orange-light);
+  --surface: var(--senac-white);
+  --border: var(--senac-border);
+  --muted: var(--senac-gray);
+  --surface-muted: var(--senac-gray-light);
+  --danger: var(--senac-danger);
+  --danger-light: var(--senac-danger-light);
+
+  /*
+   * Manual do Senac: Helvetica Neue LT Pro é reservada a material
+   * institucional impresso (diplomas, certificados, documentos). Para
+   * "meios eletrônicos" o manual indica explicitamente Verdana e Arial —
+   * é a regra aplicável a este site.
+   */
+  --font-institucional: Verdana, Arial, Helvetica, sans-serif;
 }
 
 @theme inline {
@@ -15,15 +49,20 @@
   --color-foreground: var(--foreground);
   --color-brand: var(--brand);
   --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
   --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
   --color-muted: var(--muted);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-danger: var(--danger);
+  --color-danger-light: var(--danger-light);
+  --font-sans: var(--font-institucional);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
