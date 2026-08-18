@@ -79,13 +79,28 @@ backend's environment variables.
 
 ### Current UI
 
-The home screen is a dark, cyan-accented HUD: a central holographic core
-(pure CSS/SVG, no external assets) that reflects the assistant's state
-(idle, listening, thinking, speaking, executing, error), a conversation
-panel, a command bar, quick shortcuts, a clock/date, service-health and
-connection indicators, and a settings button. A "Workshop mode" (suit lab)
-and a "Command mode" (voice/systems) share the same design language. Layout
-adapts from 360px phones to desktop; full keyboard navigation, visible
-focus, ARIA state announcements, and `prefers-reduced-motion` support are
-included. Voice input is not implemented yet — the mic button is present but
-disabled.
+The home screen is a dark, cyan-accented HUD built on a small design-token
+system (color, spacing, type, radii, glow/shadow, motion — `src/styles/tokens.css`).
+A central holographic core (pure CSS/SVG, no external assets) reflects the
+assistant's state (idle, listening, thinking, speaking, executing, error). On
+desktop it's a three-column layout: an information panel (clock/date,
+service health, connection indicator, quick shortcuts) on the left, the core
+in the center, and the conversation panel + command bar on the right. On
+phones it collapses to a single column focused on the conversation and
+command bar, with the information panel becoming a slide-in drawer (opened
+from the header's "Painel" button), respecting safe-area insets. A
+"Modo Comando" / "Modo Oficina" switch shares the same visual language — the
+workshop (suit lab) panel is a placeholder, lazy-loaded so it never adds
+weight to the default command view. A settings dialog toggles small,
+original Web-Audio-synthesized sound cues (on by default, easily muted) —
+no audio is extracted from films. Full keyboard navigation, visible focus,
+ARIA live status announcements, and `prefers-reduced-motion` support are
+included; the background particle layer is also lazy-loaded and skipped
+entirely under reduced motion. Voice input is not implemented yet — the mic
+button is present but disabled.
+
+Verified by running both dev servers and driving the real UI in headless
+Chromium at 360px, 375×812 (mobile), and 1400×900 (desktop): no console
+errors, no horizontal overflow at 360px, a real chat round-trip through the
+Mock backend, and the info drawer/settings dialog opening, trapping focus,
+and closing on Escape.

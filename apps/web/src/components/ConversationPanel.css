@@ -1,0 +1,58 @@
+.conversation-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  backdrop-filter: blur(6px);
+}
+
+.conversation-empty {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  margin-top: var(--space-6);
+}
+
+.conversation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.conversation-message {
+  max-width: 88%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.conversation-message p {
+  margin-top: var(--space-1);
+  color: var(--text-primary);
+}
+
+.conversation-role {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-muted);
+}
+
+.conversation-message-user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--cyan-500) 14%, transparent);
+  border-color: var(--color-border-strong);
+}
+
+.conversation-message-assistant {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.03);
+}

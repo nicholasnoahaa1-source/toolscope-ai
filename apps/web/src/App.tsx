@@ -1,92 +1,136 @@
-import { useId, useState, type FormEvent } from 'react'
-import { sendChatMessage } from './lib/api'
-import type { AssistantState, ChatMessage } from './lib/types'
+import { Suspense, lazy, useCallback, useEffect, useId, useState } from 'react'
+import './styles/global.css'
 import './App.css'
+import { CommandBar } from './components/CommandBar'
+import { ConversationPanel } from './components/ConversationPanel'
+import { Drawer } from './components/Drawer'
+import { Header } from './components/Header'
+import { HolographicCore } from './components/HolographicCore'
+import { InfoPanel, type ConnectionStatus } from './components/InfoPanel'
+import type { AppMode } from './components/ModeSwitch'
+import { SettingsDialog } from './components/SettingsDialog'
+import { sendChatMessage } from './lib/api'
+import { playCue } from './lib/sound'
+import { ASSISTANT_STATE_LABEL, type AssistantState, type ChatMessage } from './lib/types'
+
+const Background = lazy(() => import('./components/Background'))
+const WorkshopPanel = lazy(() => import('./components/WorkshopPanel'))
 
 function createId(): string {
   return crypto.randomUUID()
 }
 
 export default function App() {
-  const [status, setStatus] = useState<AssistantState>('idle')
+  const [assistantState, setAssistantState] = useState<AssistantState>('idle')
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [draft, setDraft] = useState('')
-  const messageInputId = useId()
+  const [mode, setMode] = useState<AppMode>('command')
+  const [infoOpen, setInfoOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [connection, setConnection] = useState<ConnectionStatus>('checking')
+  const infoTitleId = useId()
 
-  const statusLabel: Record<AssistantState, string> = {
-    idle: 'Em espera',
-    listening: 'Ouvindo',
-    thinking: 'Pensando',
-    speaking: 'Falando',
-    executing: 'Executando',
-    error: 'Erro',
-  }
+  useEffect(() => {
+    let cancelled = false
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const text = draft.trim()
-    if (!text) return
-
-    const userMessage: ChatMessage = { id: createId(), role: 'user', content: text }
-    setMessages((prev) => [...prev, userMessage])
-    setDraft('')
-    setStatus('thinking')
-
-    try {
-      const response = await sendChatMessage(text)
-      setMessages((prev) => [...prev, { id: createId(), role: 'assistant', content: response.reply }])
-      setStatus('idle')
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { id: createId(), role: 'assistant', content: 'Não consegui falar com o servidor. Tente novamente.' },
-      ])
-      setStatus('error')
+    async function checkHealth() {
+      try {
+        const response = await fetch('/api/health')
+        if (!cancelled) setConnection(response.ok ? 'online' : 'offline')
+      } catch {
+        if (!cancelled) setConnection('offline')
+      }
     }
-  }
+
+    checkHealth()
+    const id = window.setInterval(checkHealth, 20_000)
+    return () => {
+      cancelled = true
+      window.clearInterval(id)
+    }
+  }, [])
+
+  const handleSend = useCallback(
+    async (text: string) => {
+      const userMessage: ChatMessage = { id: createId(), role: 'user', content: text }
+      setMessages((prev) => [...prev, userMessage])
+      setAssistantState('thinking')
+      if (soundEnabled) playCue('send')
+
+      try {
+        const response = await sendChatMessage(text)
+        setMessages((prev) => [...prev, { id: createId(), role: 'assistant', content: response.reply }])
+        setAssistantState('speaking')
+        if (soundEnabled) playCue('receive')
+        window.setTimeout(() => setAssistantState('idle'), 900)
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          { id: createId(), role: 'assistant', content: 'Não consegui falar com o servidor. Tente novamente.' },
+        ])
+        setAssistantState('error')
+        if (soundEnabled) playCue('error')
+        window.setTimeout(() => setAssistantState('idle'), 1600)
+      }
+    },
+    [soundEnabled],
+  )
+
+  const shortcuts = [
+    { label: 'Limpar conversa', onSelect: () => setMessages([]) },
+    { label: 'Modo Comando', onSelect: () => setMode('command') },
+    { label: 'Modo Oficina', onSelect: () => setMode('workshop') },
+  ]
 
   return (
-    <main className="app">
-      <header className="app-header">
-        <h1>JARVIS</h1>
-        <p role="status" aria-live="polite" className="app-status">
-          {statusLabel[status]}
-        </p>
-      </header>
+    <div className="shell">
+      <Suspense fallback={null}>
+        <Background />
+      </Suspense>
 
-      <section className="app-history" aria-label="Histórico de conversa">
-        {messages.length === 0 ? (
-          <p className="app-history-empty">Nenhuma mensagem ainda.</p>
-        ) : (
-          <ul>
-            {messages.map((message) => (
-              <li key={message.id} className={`app-message app-message-${message.role}`}>
-                {message.content}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <form className="app-composer" onSubmit={handleSubmit}>
-        <label htmlFor={messageInputId} className="sr-only">
-          Mensagem
-        </label>
-        <input
-          id={messageInputId}
-          type="text"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          placeholder="Digite uma mensagem..."
-          autoComplete="off"
+      <div className="shell-content">
+        <Header
+          assistantState={assistantState}
+          statusLabel={ASSISTANT_STATE_LABEL[assistantState]}
+          mode={mode}
+          onModeChange={setMode}
+          infoOpen={infoOpen}
+          onOpenInfo={() => setInfoOpen(true)}
+          onOpenSettings={() => setSettingsOpen(true)}
         />
-        <button type="submit" disabled={draft.trim().length === 0}>
-          Enviar
-        </button>
-        <button type="button" disabled aria-label="Microfone (disponível em breve)" title="Disponível em breve">
-          🎤
-        </button>
-      </form>
-    </main>
+
+        <main className={`shell-main shell-main-${mode}`}>
+          <aside className="shell-info">
+            <Drawer open={infoOpen} onClose={() => setInfoOpen(false)} titleId={infoTitleId} title="Painel de informações">
+              <InfoPanel connection={connection} assistantState={assistantState} shortcuts={shortcuts} />
+            </Drawer>
+          </aside>
+
+          <section className="shell-core">
+            <HolographicCore state={assistantState} />
+          </section>
+
+          {mode === 'command' ? (
+            <div className="shell-conversation">
+              <ConversationPanel messages={messages} />
+              <CommandBar onSend={handleSend} disabled={assistantState === 'thinking'} />
+            </div>
+          ) : (
+            <div className="shell-conversation">
+              <Suspense fallback={<p className="shell-loading">Carregando laboratório…</p>}>
+                <WorkshopPanel />
+              </Suspense>
+            </div>
+          )}
+        </main>
+      </div>
+
+      <SettingsDialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        soundEnabled={soundEnabled}
+        onSoundEnabledChange={setSoundEnabled}
+      />
+    </div>
   )
 }

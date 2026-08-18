@@ -1,0 +1,36 @@
+.workshop-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+}
+
+.workshop-frame {
+  max-width: 480px;
+  text-align: center;
+  padding: var(--space-6);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-panel);
+}
+
+.workshop-eyebrow {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--amber-400);
+  margin-bottom: var(--space-2);
+}
+
+.workshop-frame h2 {
+  font-size: var(--text-lg);
+  color: var(--cyan-100);
+  margin-bottom: var(--space-3);
+}
+
+.workshop-body {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
