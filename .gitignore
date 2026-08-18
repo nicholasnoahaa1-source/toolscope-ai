@@ -42,3 +42,17 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# --- JARVIS Universal (apps/, packages/, scripts/) ---
+
+# frontend (apps/web)
+apps/**/node_modules
+apps/web/dist
+apps/web/coverage
+
+# backend (apps/api)
+apps/api/.venv
+apps/api/**/__pycache__
+apps/api/.pytest_cache
+apps/api/.ruff_cache
+apps/api/*.egg-info
