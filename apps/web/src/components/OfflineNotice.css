@@ -1,0 +1,14 @@
+.offline-notice {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--amber-500) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--amber-500) 10%, transparent);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.offline-notice-title {
+  color: var(--amber-300);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}

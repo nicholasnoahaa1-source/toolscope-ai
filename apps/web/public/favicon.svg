@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <title>JARVIS</title>
+  <rect width="48" height="48" rx="11" fill="#070d13" />
+  <g fill="none" stroke="#22c3e6" stroke-linecap="round">
+    <circle cx="24" cy="24" r="18" stroke-width="1.6" stroke-opacity="0.55" stroke-dasharray="7 3" />
+    <circle cx="24" cy="24" r="12.5" stroke-width="1.4" stroke-opacity="0.4" stroke-dasharray="1.4 2.4" />
+  </g>
+  <circle cx="24" cy="24" r="6.4" fill="#7fe4ff" />
+</svg>

@@ -1,0 +1,29 @@
+.mode-switch {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mode-switch-option {
+  padding: var(--space-2) var(--space-4);
+  min-height: 40px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  transition:
+    background var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.mode-switch-option[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--cyan-500) 22%, transparent);
+  color: var(--cyan-100);
+  box-shadow: var(--glow-cyan-sm);
+}
+
+.mode-switch-option:not([aria-pressed='true']):hover {
+  color: var(--cyan-200);
+}

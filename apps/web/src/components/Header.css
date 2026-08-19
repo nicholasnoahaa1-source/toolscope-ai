@@ -1,0 +1,81 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: calc(var(--space-4) + var(--safe-top)) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.app-title {
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-wider);
+  color: var(--cyan-100);
+  text-shadow: var(--glow-cyan-sm);
+}
+
+.app-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.app-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--state-idle);
+  box-shadow: 0 0 8px currentColor;
+}
+
+.app-status-listening .app-status-dot {
+  background: var(--state-listening);
+}
+.app-status-thinking .app-status-dot {
+  background: var(--state-thinking);
+}
+.app-status-speaking .app-status-dot {
+  background: var(--state-speaking);
+}
+.app-status-executing .app-status-dot {
+  background: var(--state-executing);
+}
+.app-status-error .app-status-dot {
+  background: var(--state-error);
+}
+
+.app-header-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.header-icon-button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  color: var(--text-secondary);
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.header-icon-button:hover {
+  border-color: var(--color-border-strong);
+  color: var(--cyan-100);
+}
+
+.mobile-only {
+  display: inline-flex;
+}
+
+@media (min-width: 900px) {
+  .mobile-only {
+    display: none;
+  }
+}

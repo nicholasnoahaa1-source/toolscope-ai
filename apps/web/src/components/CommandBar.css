@@ -1,0 +1,65 @@
+.command-bar {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-panel);
+  backdrop-filter: blur(6px);
+}
+
+.command-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3);
+  min-height: 44px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+}
+
+.command-input::placeholder {
+  color: var(--text-muted);
+}
+
+.command-input:focus-visible {
+  border-color: var(--cyan-300);
+}
+
+.command-send,
+.command-mic {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
+  color: var(--cyan-100);
+  background: color-mix(in srgb, var(--cyan-500) 14%, transparent);
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+
+.command-send:disabled,
+.command-mic:disabled {
+  opacity: 0.4;
+  border-color: var(--color-border);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.command-mic {
+  padding: 0 var(--space-3);
+}
+
+.command-stop {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--amber-500) 55%, var(--color-border));
+  color: var(--amber-300);
+  background: color-mix(in srgb, var(--amber-500) 14%, transparent);
+}
+.command-stop:hover {
+  background: color-mix(in srgb, var(--amber-500) 22%, transparent);
+}
