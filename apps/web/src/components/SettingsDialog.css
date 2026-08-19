@@ -11,11 +11,27 @@
 
 .settings-dialog {
   width: min(92vw, 420px);
+  max-height: min(85vh, 640px);
+  overflow-y: auto;
   padding: var(--space-5);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-strong);
   background: var(--color-panel-solid);
   box-shadow: var(--shadow-panel);
+}
+
+.settings-section {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.settings-section-title {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
 }
 
 .settings-header {

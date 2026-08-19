@@ -1,5 +1,6 @@
 import { useId, useRef } from 'react'
 import { useDismissableOverlay } from '../hooks/useDismissableOverlay'
+import { InstallPanel } from './InstallPanel'
 import './SettingsDialog.css'
 
 interface SettingsDialogProps {
@@ -47,6 +48,11 @@ export function SettingsDialog({ open, onClose, soundEnabled, onSoundEnabledChan
           <code>prefers-reduced-motion</code>). O microfone e a câmera continuam desativados nesta etapa — nunca
           ficam ouvindo ou vendo em segundo plano.
         </p>
+
+        <div className="settings-section">
+          <h3 className="settings-section-title">Instalar aplicativo</h3>
+          <InstallPanel />
+        </div>
       </div>
     </div>
   )

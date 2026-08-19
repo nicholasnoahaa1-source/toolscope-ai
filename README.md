@@ -104,3 +104,47 @@ Chromium at 360px, 375×812 (mobile), and 1400×900 (desktop): no console
 errors, no horizontal overflow at 360px, a real chat round-trip through the
 Mock backend, and the info drawer/settings dialog opening, trapping focus,
 and closing on Escape.
+
+### PWA (installable app)
+
+`apps/web` is an installable PWA: a full manifest (name, colors, standalone
+display, flexible orientation), an original SVG holographic-core icon
+(`apps/web/public/icons/icon-master.svg` / `icon-maskable-master.svg`, no
+Marvel assets) rasterized by a reproducible script
+(`npm run generate-icons` inside `apps/web`, uses `sharp` — re-run it
+whenever the master SVGs change), and a service worker (`vite-plugin-pwa`)
+that precaches **only** the built shell (HTML/JS/CSS/icons/manifest). It
+never intercepts or caches `/api/*` — chat replies, camera/vision data, and
+any future private data always go straight to the network, uncached.
+
+- **Offline**: the shell keeps working and shows a clear "Sem conexão no
+  momento" notice explaining what still works (viewing the current session)
+  and what doesn't (sending new messages) until the connection returns.
+- **Install**: Settings → "Instalar aplicativo" shows the native install
+  button where supported (Chrome/Edge/Android), manual "Adicionar à Tela de
+  Início" steps on iOS Safari, and always shows how to remove the app
+  afterward. The app works identically installed or not.
+- **Updates**: new versions never auto-reload. A small banner
+  ("Nova versão disponível — Atualizar agora / Depois") only activates the
+  new service worker when the user confirms.
+
+**Testing locally on Windows:**
+
+```powershell
+scripts\dev.ps1              # dev mode — the service worker is disabled in `vite dev` by design
+cd apps\web
+npm run build; npm run preview   # production build, PWA fully active at http://localhost:4173
+```
+
+Open `http://localhost:4173` in Chrome/Edge, check DevTools → Application →
+Manifest/Service Workers, then use DevTools' "Offline" throttling (or turn
+off Wi-Fi) and reload to see the offline shell. Installability requires
+HTTPS in real deployments — `localhost` is exempt for local testing.
+
+**Testing in the browser's phone simulation mode:** open DevTools → Toggle
+device toolbar (Ctrl+Shift+M), pick a phone preset, reload
+`http://localhost:4173`, then open the JARVIS Settings panel to see the
+install instructions adapt (Chrome's device emulation still reports a
+desktop user agent by default, so switch DevTools' emulated device to see
+the iOS manual-install text, or test on a real Android/iPhone on the same
+network for the real native install prompt).

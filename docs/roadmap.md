@@ -27,6 +27,17 @@ adiantado.
 - Responsividade 360px→desktop, acessibilidade (teclado, foco, ARIA,
   `prefers-reduced-motion`).
 
+## Etapa 2 — PWA instalável (concluída nesta sessão)
+
+- Manifest completo (`apps/web/public` + `vite-plugin-pwa`): nome, cores,
+  modo standalone, orientação flexível, ícones originais (SVG + script
+  reproduzível `npm run generate-icons`).
+- Service worker (`generateSW`) cacheando somente o shell buildado; nenhuma
+  rota `/api/*` é interceptada ou cacheada.
+- Tela offline clara explicando o que continua disponível.
+- Interface de instalação (prompt nativo, passo a passo manual no iOS,
+  instruções de remoção) e aviso de atualização com ativação manual segura.
+
 ## Próximas etapas (ainda não iniciadas — apenas planejamento)
 
 - **Memória e contexto**: histórico persistente local, resumo de contexto
@@ -44,8 +55,6 @@ adiantado.
   sensíveis, log auditável local.
 - **`apps/desktop`**: empacotamento como aplicativo Windows (avaliação de
   Tauri/Rust será feita e aprovada em etapa própria — não iniciada).
-- **PWA**: manifest, service worker, instalável no celular, antes do
-  empacotamento desktop.
 - **Laboratório de traje 3D**: visualização 3D experimental dentro do "modo
   oficina", carregada sob demanda (lazy) para não pesar o carregamento
   inicial.

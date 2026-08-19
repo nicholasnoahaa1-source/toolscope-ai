@@ -42,6 +42,12 @@ elas se traduzem em decisões técnicas.
     implementado, `apps/bridge` exigirá pareamento explícito do dispositivo e
     operará apenas sobre uma lista de permissões (allowlist) de ações e
     aplicativos — nunca execução arbitrária.
+11. **Cache do service worker (PWA) é só o shell.** O service worker de
+    `apps/web` (`vite-plugin-pwa`, estratégia `generateSW`) só tem uma lista
+    de precache com os arquivos estáticos versionados do build (HTML, JS,
+    CSS, ícones, manifest). Não há `runtimeCaching` configurado para
+    `/api/*`: respostas do chat, dados de visão/câmera e qualquer memória
+    futura nunca passam pelo cache do navegador — sempre vão direto à rede.
 
 ## Tratamento de erros
 

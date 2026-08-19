@@ -81,6 +81,19 @@ describe('App', () => {
     expect(screen.queryByPlaceholderText('Digite um comando...')).not.toBeInTheDocument()
   })
 
+  it('shows an offline notice when the browser goes offline, and hides it when back online', async () => {
+    stubFetch({ reply: 'ok', provider: 'mock' })
+    vi.stubGlobal('navigator', { ...navigator, onLine: false })
+    render(<App />)
+
+    expect(await screen.findByText(/sem conexão no momento/i)).toBeInTheDocument()
+
+    vi.stubGlobal('navigator', { ...navigator, onLine: true })
+    window.dispatchEvent(new Event('online'))
+
+    await waitFor(() => expect(screen.queryByText(/sem conexão no momento/i)).not.toBeInTheDocument())
+  })
+
   it('opens and closes the settings dialog', async () => {
     stubFetch({ reply: 'ok', provider: 'mock' })
     const user = userEvent.setup()
@@ -91,5 +104,16 @@ describe('App', () => {
 
     await user.keyboard('{Escape}')
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Configurações' })).not.toBeInTheDocument())
+  })
+
+  it('shows the install section inside settings', async () => {
+    stubFetch({ reply: 'ok', provider: 'mock' })
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(screen.getByRole('button', { name: 'Configurações' }))
+
+    expect(screen.getByRole('heading', { name: 'Instalar aplicativo' })).toBeInTheDocument()
+    expect(screen.getByText('Como remover o aplicativo')).toBeInTheDocument()
   })
 })

@@ -11,6 +11,16 @@
   min-height: 100svh;
 }
 
+.shell-content > .offline-notice {
+  margin: var(--space-4) calc(var(--space-4) + var(--safe-left)) 0 calc(var(--space-4) + var(--safe-right));
+}
+
+@media (min-width: 900px) {
+  .shell-content > .offline-notice {
+    margin: var(--space-5) calc(var(--space-6) + var(--safe-right)) 0 calc(var(--space-6) + var(--safe-left));
+  }
+}
+
 .shell-main {
   flex: 1;
   min-height: 0;

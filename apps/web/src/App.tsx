@@ -8,7 +8,10 @@ import { Header } from './components/Header'
 import { HolographicCore } from './components/HolographicCore'
 import { InfoPanel, type ConnectionStatus } from './components/InfoPanel'
 import type { AppMode } from './components/ModeSwitch'
+import { OfflineNotice } from './components/OfflineNotice'
 import { SettingsDialog } from './components/SettingsDialog'
+import { UpdateBanner } from './components/UpdateBanner'
+import { useOnlineStatus } from './hooks/useOnlineStatus'
 import { sendChatMessage } from './lib/api'
 import { playCue } from './lib/sound'
 import { ASSISTANT_STATE_LABEL, type AssistantState, type ChatMessage } from './lib/types'
@@ -28,9 +31,15 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [connection, setConnection] = useState<ConnectionStatus>('checking')
+  const isOnline = useOnlineStatus()
   const infoTitleId = useId()
 
   useEffect(() => {
+    if (!isOnline) {
+      setConnection('offline')
+      return
+    }
+
     let cancelled = false
 
     async function checkHealth() {
@@ -48,7 +57,7 @@ export default function App() {
       cancelled = true
       window.clearInterval(id)
     }
-  }, [])
+  }, [isOnline])
 
   const handleSend = useCallback(
     async (text: string) => {
@@ -99,6 +108,8 @@ export default function App() {
           onOpenSettings={() => setSettingsOpen(true)}
         />
 
+        {!isOnline && <OfflineNotice />}
+
         <main className={`shell-main shell-main-${mode}`}>
           <aside className="shell-info">
             <Drawer open={infoOpen} onClose={() => setInfoOpen(false)} titleId={infoTitleId} title="Painel de informações">
@@ -131,6 +142,8 @@ export default function App() {
         soundEnabled={soundEnabled}
         onSoundEnabledChange={setSoundEnabled}
       />
+
+      <UpdateBanner />
     </div>
   )
 }
