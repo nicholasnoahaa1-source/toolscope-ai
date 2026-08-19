@@ -123,6 +123,20 @@ errors, no horizontal overflow at 360px, a real chat round-trip through the
 Mock backend, and the info drawer/settings dialog opening, trapping focus,
 and closing on Escape.
 
+### AI providers (mock by default, optional real ones)
+
+Chat replies stream in over Server-Sent Events, with a "Parar" (Stop)
+button that cancels mid-response and a live status (Pensando/Falando).
+`JARVIS_CHAT_PROVIDER` picks the backend: `mock` (default, no key needed),
+`anthropic` (server-only, needs `JARVIS_MODEL` + `JARVIS_ANTHROPIC_API_KEY`),
+or `local` (an OpenAI-compatible local server at `JARVIS_LOCAL_PROVIDER_URL`,
+never assumed to be installed). A misconfigured or failing optional
+provider surfaces a friendly in-chat error instead of crashing — switch
+back to `mock` in `apps/api/.env` at any time. See
+`docs/architecture.md` and `docs/security-model.md` for the full design
+(timeouts, retries, concurrency cap, and the daily message limit that only
+applies to paid/external providers).
+
 ### PWA (installable app)
 
 `apps/web` is an installable PWA: a full manifest (name, colors, standalone

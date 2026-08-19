@@ -5,17 +5,21 @@ from app import auth
 from app.auth import hash_token
 from app.config import Settings, get_settings
 from app.main import app
+from app.routers import chat as chat_router
 
 TEST_ACCESS_TOKEN = "test-only-access-token-not-a-secret"
 
 
 @pytest.fixture(autouse=True)
 def reset_rate_limit_state():
-    # TestClient sempre reporta o mesmo IP; sem isso, um teste de limite de
-    # tentativas vazaria para os testes seguintes.
+    # TestClient sempre reporta o mesmo IP; sem isso, o estado de um teste
+    # (tentativas de /api/entrar, limite diário do chat) vazaria para os
+    # testes seguintes.
     auth._failed_attempts.clear()
+    chat_router._daily_counts.clear()
     yield
     auth._failed_attempts.clear()
+    chat_router._daily_counts.clear()
 
 
 @pytest.fixture

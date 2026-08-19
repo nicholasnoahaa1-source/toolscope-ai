@@ -3,10 +3,12 @@ import './CommandBar.css'
 
 interface CommandBarProps {
   onSend: (message: string) => void
+  onStop: () => void
   disabled?: boolean
+  isStreaming?: boolean
 }
 
-export function CommandBar({ onSend, disabled }: CommandBarProps) {
+export function CommandBar({ onSend, onStop, disabled, isStreaming }: CommandBarProps) {
   const [draft, setDraft] = useState('')
   const inputId = useId()
 
@@ -33,9 +35,15 @@ export function CommandBar({ onSend, disabled }: CommandBarProps) {
         autoComplete="off"
         disabled={disabled}
       />
-      <button type="submit" className="command-send" disabled={disabled || draft.trim().length === 0}>
-        Enviar
-      </button>
+      {isStreaming ? (
+        <button type="button" className="command-stop" onClick={onStop}>
+          Parar
+        </button>
+      ) : (
+        <button type="submit" className="command-send" disabled={disabled || draft.trim().length === 0}>
+          Enviar
+        </button>
+      )}
       <button
         type="button"
         className="command-mic"

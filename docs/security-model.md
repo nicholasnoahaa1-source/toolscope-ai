@@ -48,6 +48,14 @@ elas se traduzem em decisões técnicas.
     CSS, ícones, manifest). Não há `runtimeCaching` configurado para
     `/api/*`: respostas do chat, dados de visão/câmera e qualquer memória
     futura nunca passam pelo cache do navegador — sempre vão direto à rede.
+12. **Provedores de IA opcionais só chamam a rede a partir do servidor.**
+    `apps/api` é o único lugar que fala com Anthropic ou um servidor local —
+    o frontend nunca recebe chave nem faz a chamada. Mensagens de erro de
+    provedor mostram o status HTTP e uma explicação, nunca o corpo bruto da
+    resposta (que poderia conter a chave ecoada) nem a chave/URL
+    configurada. Timeout, limite de tentativas e concorrência máxima
+    protegem contra custo/latência descontrolados; um limite diário por IP
+    (nunca aplicado ao Mock) limita o gasto de um provedor pago.
 
 ## Acesso por link secreto (sem login/senha)
 

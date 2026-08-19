@@ -43,11 +43,26 @@ toolscope-ai/
   - `POST /api/entrar` — troca um token de acesso secreto por uma sessão
     (cookie assinado). Ver `docs/security-model.md`.
   - `GET /api/session` — confirma sessão válida (404 sem sessão).
-  - `POST /api/chat` — conversa com um provedor **Mock** (respostas simples em
-    pt-BR, sem chamadas externas nem chave de API), protegida por sessão. A
-    troca por um provedor real (ex.: Anthropic) acontece atrás de uma
-    interface `ChatProvider`, trocável por configuração, mantendo a regra de
-    "sem API paga para começar".
+  - `POST /api/chat` — conversa em streaming (Server-Sent Events),
+    protegida por sessão, cancelável pelo cliente a qualquer momento.
+  - `GET /api/chat/status` — informa o provedor configurado (protegida).
+- **Camada de provedores de chat** (`app/providers/`): interface
+  `ChatProvider` tipada (`stream(message) -> AsyncIterator[str]`) com três
+  adaptadores plugáveis por `JARVIS_CHAT_PROVIDER`:
+  - `mock` (padrão) — respostas simples em pt-BR, sem chamada externa,
+    funcional offline.
+  - `anthropic` — chama a API de Mensagens da Anthropic via `httpx`
+    (streaming), somente a partir do servidor; exige `JARVIS_MODEL` e
+    `JARVIS_ANTHROPIC_API_KEY` (nenhum modelo fixo no código).
+  - `local` — fala com um servidor local compatível com o formato de
+    streaming da OpenAI (`JARVIS_LOCAL_PROVIDER_URL`), sem presumir que
+    esteja instalado.
+  Timeout, número de tentativas e concorrência máxima por provedor são
+  configuráveis; um limite diário de mensagens (`JARVIS_DAILY_MESSAGE_LIMIT`)
+  se aplica só a `anthropic`/`local` — o Mock nunca é limitado. Se um
+  provedor opcional estiver mal configurado ou falhar, a resposta é um
+  evento de erro amigável (nunca um erro genérico do servidor), e a
+  interface permite voltar ao Mock nas configurações.
 - CORS restrito a origens explícitas de desenvolvimento (nunca curinga com
   credenciais).
 - Acesso: sem login/senha — um link secreto (`/entrar/<token>`) autentica o

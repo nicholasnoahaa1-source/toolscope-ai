@@ -10,6 +10,8 @@ interface InfoPanelProps {
   shortcuts: { label: string; onSelect: () => void }[]
   /** Só é exibido quando configurado — sem provedor de clima nesta etapa. */
   weather?: string
+  /** Provedor de chat configurado no servidor: "mock", "anthropic" ou "local". */
+  providerMode?: string | null
 }
 
 const CONNECTION_LABEL: Record<ConnectionStatus, string> = {
@@ -18,7 +20,13 @@ const CONNECTION_LABEL: Record<ConnectionStatus, string> = {
   checking: 'Verificando conexão…',
 }
 
-export function InfoPanel({ connection, assistantState, shortcuts, weather }: InfoPanelProps) {
+const PROVIDER_MODE_LABEL: Record<string, string> = {
+  mock: 'Modo demonstração',
+  anthropic: 'Nuvem (Anthropic)',
+  local: 'Local',
+}
+
+export function InfoPanel({ connection, assistantState, shortcuts, weather, providerMode }: InfoPanelProps) {
   const clock = useClock()
 
   return (
@@ -41,6 +49,11 @@ export function InfoPanel({ connection, assistantState, shortcuts, weather }: In
           {CONNECTION_LABEL[connection]}
         </p>
         <p className="info-detail">Estado do núcleo: {assistantState}</p>
+        {providerMode && (
+          <p className={`info-pill info-pill-provider-${providerMode}`}>
+            {PROVIDER_MODE_LABEL[providerMode] ?? providerMode}
+          </p>
+        )}
       </section>
 
       <section aria-labelledby="info-shortcuts-heading" className="info-block">

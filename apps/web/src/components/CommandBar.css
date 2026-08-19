@@ -50,3 +50,16 @@
 .command-mic {
   padding: 0 var(--space-3);
 }
+
+.command-stop {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--amber-500) 55%, var(--color-border));
+  color: var(--amber-300);
+  background: color-mix(in srgb, var(--amber-500) 14%, transparent);
+}
+.command-stop:hover {
+  background: color-mix(in srgb, var(--amber-500) 22%, transparent);
+}

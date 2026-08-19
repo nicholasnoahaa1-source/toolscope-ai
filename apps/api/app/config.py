@@ -13,6 +13,20 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     chat_provider: str = "mock"
 
+    # --- Provedores de chat opcionais ---
+    # Nenhum modelo fixo é hardcoded no código (evita apontar para um
+    # identificador que fica obsoleto) — quando um provedor real é usado,
+    # o modelo vem obrigatoriamente desta configuração.
+    model: str = ""
+    anthropic_api_key: str = ""
+    local_provider_url: str = ""
+    request_timeout_seconds: float = 30.0
+    max_concurrent_provider_requests: int = 3
+    max_provider_retries: int = 1
+    # Limite diário de mensagens por IP, aplicado só a provedores pagos/
+    # externos (nunca ao Mock, que não tem custo).
+    daily_message_limit: int = 200
+
     # Origens explícitas permitidas para CORS em desenvolvimento.
     # Nunca usar "*" combinado com allow_credentials=True.
     cors_allowed_origins: list[str] = [

@@ -3,6 +3,17 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 
+function sseBody(events: { event: string; data: Record<string, unknown> }[]): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder()
+  const text = events.map(({ event, data }) => `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`).join('')
+  return new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode(text))
+      controller.close()
+    },
+  })
+}
+
 describe('App', () => {
   afterEach(() => {
     vi.restoreAllMocks()
@@ -17,10 +28,25 @@ describe('App', () => {
         if (url.includes('/api/health')) {
           return { ok: true, json: async () => ({ status: 'ok', service: 'jarvis-api' }) }
         }
-        if (chatReply === null) {
-          return { ok: false, json: async () => ({}) }
+        if (url.includes('/api/chat/status')) {
+          return { ok: true, json: async () => ({ provider: 'mock' }) }
         }
-        return { ok: true, json: async () => chatReply }
+        if (url.includes('/api/chat')) {
+          if (chatReply === null) {
+            return {
+              ok: true,
+              body: sseBody([{ event: 'error', data: { message: 'Não foi possível falar com o provedor.' } }]),
+            }
+          }
+          return {
+            ok: true,
+            body: sseBody([
+              { event: 'chunk', data: { text: chatReply.reply } },
+              { event: 'done', data: { provider: chatReply.provider } },
+            ]),
+          }
+        }
+        return { ok: true, json: async () => ({}) }
       }),
     )
   }
@@ -41,7 +67,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /microfone/i })).toBeDisabled()
   })
 
-  it('disables send until there is text, then sends the message and shows the reply', async () => {
+  it('disables send until there is text, then streams the message and shows the reply', async () => {
     stubFetch({ reply: 'Olá! Modo de demonstração.', provider: 'mock' })
     const user = userEvent.setup()
     render(<App />)
@@ -56,9 +82,39 @@ describe('App', () => {
 
     expect(await screen.findByText('Olá! Modo de demonstração.')).toBeInTheDocument()
     expect(screen.getByText('Olá')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Em espera'))
   })
 
-  it('shows an error message and error status when the API call fails', async () => {
+  it('shows a Stop button while streaming that lets the user cancel', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = typeof input === 'string' ? input : input.toString()
+        if (url.includes('/api/health')) return { ok: true, json: async () => ({ status: 'ok' }) }
+        if (url.includes('/api/chat/status')) return { ok: true, json: async () => ({ provider: 'mock' }) }
+        if (url.includes('/api/chat')) {
+          // Só resolve quando o teste cancela via AbortController — igual
+          // ao comportamento real do fetch com um signal.
+          return new Promise((_resolve, reject) => {
+            init?.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')))
+          })
+        }
+        return { ok: true, json: async () => ({}) }
+      }),
+    )
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.type(screen.getByPlaceholderText('Digite um comando...'), 'Olá')
+    await user.click(screen.getByRole('button', { name: 'Enviar' }))
+
+    const stopButton = await screen.findByRole('button', { name: 'Parar' })
+    await user.click(stopButton)
+
+    expect(await screen.findByText(/interrompid/i)).toBeInTheDocument()
+  })
+
+  it('shows an error message and error status when the provider fails', async () => {
     stubFetch(null)
     const user = userEvent.setup()
     render(<App />)
@@ -66,7 +122,7 @@ describe('App', () => {
     await user.type(screen.getByPlaceholderText('Digite um comando...'), 'Oi')
     await user.click(screen.getByRole('button', { name: 'Enviar' }))
 
-    expect(await screen.findByText(/não consegui falar com o servidor/i)).toBeInTheDocument()
+    expect(await screen.findByText(/não foi possível falar com o provedor/i)).toBeInTheDocument()
     expect(screen.getByRole('status')).toHaveTextContent('Erro')
   })
 
