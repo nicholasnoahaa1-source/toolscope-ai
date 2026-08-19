@@ -39,14 +39,21 @@ toolscope-ai/
   sensível), tratamento uniforme de erros (handler global retornando JSON
   padronizado).
 - Endpoints iniciais:
-  - `GET /api/health` — checagem de disponibilidade.
+  - `GET /api/health` — checagem de disponibilidade (pública, mínima).
+  - `POST /api/entrar` — troca um token de acesso secreto por uma sessão
+    (cookie assinado). Ver `docs/security-model.md`.
+  - `GET /api/session` — confirma sessão válida (404 sem sessão).
   - `POST /api/chat` — conversa com um provedor **Mock** (respostas simples em
-    pt-BR, sem chamadas externas nem chave de API). A troca por um provedor
-    real (ex.: Anthropic) acontece atrás de uma interface `ChatProvider`,
-    trocável por configuração, mantendo a regra de "sem API paga para
-    começar".
+    pt-BR, sem chamadas externas nem chave de API), protegida por sessão. A
+    troca por um provedor real (ex.: Anthropic) acontece atrás de uma
+    interface `ChatProvider`, trocável por configuração, mantendo a regra de
+    "sem API paga para começar".
 - CORS restrito a origens explícitas de desenvolvimento (nunca curinga com
   credenciais).
+- Acesso: sem login/senha — um link secreto (`/entrar/<token>`) autentica o
+  dispositivo via cookie de sessão assinado. Sem sessão válida, rotas
+  protegidas respondem como se não existissem (404 genérico). Detalhes
+  completos em `docs/security-model.md`.
 
 ## Integração e produção
 

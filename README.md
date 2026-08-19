@@ -77,6 +77,24 @@ The web UI talks to the API in development through Vite's dev proxy — no
 secrets are ever placed in the browser. See `apps/api/.env.example` for the
 backend's environment variables.
 
+### Access (secret link, no login)
+
+There is no login screen or password. Access is a single secret link:
+
+```powershell
+scripts\generate-access-link.ps1   # prints a token, its hash, and the /entrar/<token> link
+```
+
+Copy the printed `JARVIS_ACCESS_TOKEN_HASH` into `apps/api/.env` (never
+commit it), restart the API, then open the printed `/entrar/<token>` link
+once — it exchanges the token for a signed session cookie and the token
+never stays in the address bar. Without a valid session, every page and
+protected API responds exactly like a 404 ("Not Found") — nothing reveals
+that a private JARVIS exists there. If the link ever leaks, run
+`scripts\rotate-access-link.ps1`: it issues a new link **and** invalidates
+every session already open, immediately. See `docs/security-model.md` for
+the full mechanism.
+
 ### Current UI
 
 The home screen is a dark, cyan-accented HUD built on a small design-token

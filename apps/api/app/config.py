@@ -20,6 +20,22 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
     ]
 
+    # --- Acesso por link secreto (sem login/senha) ---
+    # Hash SHA-256 (hex) do token de acesso real. O token em texto puro
+    # nunca é configurado nem armazenado — só o hash, gerado por
+    # scripts/generate-access-link.ps1. Vazio = acesso desativado (nenhum
+    # token é aceito), o que é o padrão seguro para desenvolvimento local
+    # sem link configurado.
+    access_token_hash: str = ""
+    # Chave usada para assinar o cookie de sessão. Trocar este valor
+    # invalida todas as sessões emitidas anteriormente.
+    session_secret: str = "changeme-dev-only-session-secret"
+    session_cookie_name: str = "jarvis_session"
+    session_max_age_seconds: int = 60 * 60 * 24 * 30  # 30 dias
+    # Tentativas inválidas de /api/entrar aceitas por IP na janela abaixo.
+    entrar_rate_limit_attempts: int = 5
+    entrar_rate_limit_window_seconds: int = 60
+
 
 @lru_cache
 def get_settings() -> Settings:

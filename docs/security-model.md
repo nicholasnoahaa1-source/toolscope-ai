@@ -49,6 +49,45 @@ elas se traduzem em decisões técnicas.
     `/api/*`: respostas do chat, dados de visão/câmera e qualquer memória
     futura nunca passam pelo cache do navegador — sempre vão direto à rede.
 
+## Acesso por link secreto (sem login/senha)
+
+O JARVIS não tem tela de login nem senha: quem possui o link
+`/entrar/<token>` entra; quem não tem, não vê nada. Detalhes:
+
+- O token em texto puro **nunca** é configurado nem armazenado — apenas seu
+  hash SHA-256 (`JARVIS_ACCESS_TOKEN_HASH`), gerado por
+  `scripts/generate-access-link.ps1`. Sem hash configurado, nenhum token é
+  aceito (padrão seguro para ambientes sem link emitido).
+- A comparação do token usa `hmac.compare_digest` (resistente a ataques de
+  tempo), nunca `==`.
+- Sessão: cookie assinado (`itsdangerous`, `JARVIS_SESSION_SECRET`),
+  `HttpOnly`, `Secure` em produção, `SameSite=Lax`, expira em 30 dias.
+  Trocar `JARVIS_SESSION_SECRET` (via `scripts/rotate-access-link.ps1`)
+  invalida **todas** as sessões emitidas antes, imediatamente.
+- Sem sessão válida, `/api/session` e `/api/chat` respondem exatamente como
+  o 404 padrão do FastAPI (`{"detail": "Not Found"}`) — impossível
+  distinguir "rota protegida" de "rota que não existe".
+- `/api/entrar` tem limite de tentativas por IP em memória
+  (`JARVIS_ENTRAR_RATE_LIMIT_ATTEMPTS`/`_WINDOW_SECONDS`); tentativas
+  inválidas são logadas sem o valor do token enviado. **Limitação
+  conhecida:** o contador é em memória por processo — uma implantação com
+  múltiplos processos/workers precisaria de um armazenamento compartilhado
+  (ex.: Redis) para o limite valer entre eles.
+- Anti-indexação em toda resposta da API (`X-Robots-Tag`) e do frontend
+  (`<meta name="robots">`, `robots.txt` nos dois lados), mais
+  `Referrer-Policy: no-referrer` — sem sitemap, sem página pública.
+- O frontend (`apps/web`) confirma a sessão via `GET /api/session` antes de
+  renderizar a interface do JARVIS; sem sessão, mostra uma tela 404
+  genérica sem qualquer indício do produto. **Limitação conhecida:** por
+  enquanto isso é um SPA estático — o pacote JS ainda é baixado antes dessa
+  checagem rodar. A proteção forte (o servidor nunca serve nada sem
+  sessão) só existe hoje em `/api/chat`; ela se estende ao HTML/JS quando o
+  FastAPI passar a servir `apps/web/dist` no mesmo domínio (etapa de
+  deploy, ainda não implementada).
+- Este mecanismo não substitui autenticação forte: **se o link vazar,
+  qualquer pessoa que o tiver poderá entrar.** Rotacione com
+  `scripts/rotate-access-link.ps1` assim que suspeitar de vazamento.
+
 ## Tratamento de erros
 
 A API expõe um handler de exceção global que converte qualquer erro não
