@@ -24,6 +24,20 @@ Vite + Three.js + Motion, tudo servido localmente (sem CDN, sem Google Fonts).
    `.glb`, substituir `construirSacole()` por um GLTFLoader mantendo os meshes
    com os nomes `saquinho`, `creme` e `pedacos`.
 
+## Auditoria dos critérios de aceite
+
+    npm run build && npx vite preview --port 4173 &
+    node auditoria.mjs
+
+Verifica contraste de todo texto contra o fundo realmente pintado atrás dele
+nos dois temas, alvos de toque de 44px, o menu por teclado (abre, tabula, fecha
+no Esc e devolve o foco), `h1` único, landmarks, `alt` em toda imagem, canvas
+fora da ordem de foco, rolagem horizontal em 320/375/768/1280/1600px e o
+desligamento do 3D com `prefers-reduced-motion`.
+
+Fora do alcance deste script: os 60fps em celular intermediário — precisa de
+aparelho real.
+
 ## 3D
 
 - `MeshPhysicalMaterial` com `transmission`/`thickness`/`ior` 1.45 no saquinho;

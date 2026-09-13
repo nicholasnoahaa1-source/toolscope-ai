@@ -33,6 +33,12 @@
   --acento: var(--terracota);
   --fio: color-mix(in srgb, var(--navy) 28%, transparent);
 
+  /* Três papéis distintos para o acento: preenchimento, texto sobre o
+     preenchimento, e o acento usado como texto. Separados porque o terracota
+     da marca não alcança 4.5:1 como texto sobre o creme-alt. */
+  --acento-texto: #a63d19;
+  --sobre-acento: #fff;
+
   --serif: 'Tiempos Text', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --sans: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
 
@@ -48,7 +54,9 @@
     --solido: #f4e9d5;
     --sobre-solido: #071c31;
     --texto: #f6eddd;
-    --acento: #ef8a5e;          /* 4.5:1 sobre o fundo escuro */
+    --acento: #ef8a5e;
+    --acento-texto: #ef8a5e;    /* 6.9:1 sobre o fundo escuro */
+    --sobre-acento: #071c31;
     --fio: color-mix(in srgb, #f6eddd 34%, transparent);
   }
 }
@@ -59,6 +67,8 @@
   --sobre-solido: #071c31;
   --texto: #f6eddd;
   --acento: #ef8a5e;
+  --acento-texto: #ef8a5e;
+  --sobre-acento: #071c31;
   --fio: color-mix(in srgb, #f6eddd 34%, transparent);
 }
 
@@ -122,10 +132,13 @@ a { color: inherit; }
   display: flex; align-items: center; justify-content: space-between;
   gap: 1rem; min-height: 56px;
 }
-.logo { font-family: var(--serif); font-style: italic; font-size: 1.35rem; text-decoration: none; }
+.logo {
+  font-family: var(--serif); font-style: italic; font-size: 1.35rem;
+  text-decoration: none; display: inline-flex; align-items: center; min-height: 44px;
+}
 .nav-desktop { display: none; gap: 1.75rem; }
 .nav-desktop a { text-decoration: none; }
-.nav-desktop a:hover { color: var(--acento); }
+.nav-desktop a:hover { color: var(--acento-texto); }
 
 .botao-icone {
   display: inline-flex; align-items: center; justify-content: center;
@@ -171,7 +184,7 @@ a { color: inherit; }
   letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none;
   border: 1px solid var(--solido); cursor: pointer;
 }
-.botao--principal { background: var(--acento); border-color: var(--acento); color: #fff; }
+.botao--principal { background: var(--acento); border-color: var(--acento); color: var(--sobre-acento); }
 .botao--principal:hover { background: color-mix(in srgb, var(--acento) 85%, #000); }
 .botao--secundario { background: transparent; color: var(--texto); }
 .botao--secundario:hover { background: var(--solido); color: var(--sobre-solido); }
@@ -212,7 +225,7 @@ body { padding-bottom: 76px; }
   background: none; border: 0; border-bottom: 1px solid var(--fio);
   color: inherit; font: inherit; cursor: pointer; padding: 0.9rem 0;
 }
-.sabor:hover .sabor__nome { color: var(--acento); }
+.sabor:hover .sabor__nome { color: var(--acento-texto); }
 .sabor[aria-pressed='true'] { background: var(--solido); color: var(--sobre-solido); padding-inline: 0.9rem; }
 .sabor__nome { font-family: var(--serif); font-style: italic; font-size: 1.4rem; }
 .sabor__preco { font-family: var(--serif); font-style: italic; white-space: nowrap; }
@@ -228,13 +241,17 @@ body { padding-bottom: 76px; }
 }
 
 .pendencia {
-  border: 1px dashed var(--acento); color: var(--acento);
+  border: 1px dashed var(--acento-texto); color: var(--acento-texto);
   padding: 0.25rem 0.5rem; font-size: 0.8rem; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase; display: inline-block;
 }
 
+.rodape .pendencia,
+.barra-pedido .pendencia { border-color: currentColor; color: inherit; }
+
 .aviso-dev {
-  background: var(--acento); color: #fff; padding: 0.75rem var(--gutter); font-size: 0.85rem;
+  background: var(--acento); color: var(--sobre-acento);
+  padding: 0.75rem var(--gutter); font-size: 0.85rem;
 }
 
 .rodape { background: var(--solido); color: var(--sobre-solido); padding-block: clamp(2rem, 6vw, 4rem); }
