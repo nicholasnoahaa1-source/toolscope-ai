@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR" data-tema="">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SacoPex — sacolé artesanal em Curicica, Jacarepaguá</title>
+<meta name="description" content="Sacolé artesanal feito à mão em Curicica, Jacarepaguá. Escolha o sabor e peça pelo WhatsApp.">
+<link rel="stylesheet" href="/src/estilo.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<div id="aviso-dev"></div>
+
+<header class="cabecalho">
+  <div class="envoltorio cabecalho__linha">
+    <a class="logo" href="#" data-campo="marca.nome">SacoPex</a>
+    <nav class="nav-desktop" aria-label="Principal">
+      <a href="#sabores">Sabores</a>
+      <a href="#combos">Combos</a>
+      <a href="#entrega">Entrega</a>
+      <a href="#avaliacoes">Avaliações</a>
+    </nav>
+    <div class="controles">
+      <button class="botao-icone" id="botao-tema" type="button" aria-label="Alternar tema claro e escuro">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M20 13.5A8 8 0 0 1 10.5 4a8 8 0 1 0 9.5 9.5Z"/>
+        </svg>
+      </button>
+      <button class="botao-icone botao-menu" id="botao-menu" type="button"
+              aria-expanded="false" aria-controls="nav-mobile" aria-label="Abrir menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <nav class="nav-mobile" id="nav-mobile" aria-label="Principal (celular)" hidden>
+    <a href="#sabores">Sabores</a>
+    <a href="#combos">Combos</a>
+    <a href="#entrega">Entrega</a>
+    <a href="#avaliacoes">Avaliações</a>
+  </nav>
+</header>
+
+<main id="conteudo">
+  <section class="heroi">
+    <div class="envoltorio heroi__grade">
+      <div class="heroi__texto">
+        <p class="rotulo" data-campo="marca.cidade">Curicica, Jacarepaguá</p>
+        <h1 data-campo="marca.nome">SacoPex</h1>
+        <p data-campo="marca.slogan"></p>
+        <p data-campo="marca.diferencial"></p>
+        <div class="acoes">
+          <a class="botao botao--principal" id="pedir-heroi" href="#sabores">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="M3.5 20.5 5 16a8 8 0 1 1 3 3l-4.5 1.5Z"/>
+            </svg>
+            Pedir no WhatsApp
+          </a>
+          <a class="botao botao--secundario" href="#sabores">Ver sabores</a>
+        </div>
+      </div>
+      <div class="heroi__palco palco" id="palco">
+        <div class="palco__fundo" aria-hidden="true"></div>
+        <figure class="palco__placa">
+          <canvas class="palco__quadros" aria-hidden="true"></canvas>
+          <img class="palco__foto"
+               src="/imagens/sacole-oreo-produto.webp"
+               srcset="/imagens/sacole-oreo-produto-sm.webp 600w, /imagens/sacole-oreo-produto.webp 1200w"
+               sizes="(min-width: 60rem) 50vw, 100vw"
+               width="1200" height="1600" decoding="async"
+               alt="Uma mão segura um sacolé de creme claro salpicado de pedaços de biscoito de chocolate, com o saquinho torcido e amarrado no topo.">
+        </figure>
+        <div class="palco__sombra" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="secao" id="sabores">
+    <div class="envoltorio">
+      <div class="secao__cabeca">
+        <p class="rotulo">01 — Sabores</p>
+        <h2>Escolha e veja mudar</h2>
+        <p>Tocar num sabor troca o recheio do sacolé na cena 3D.</p>
+      </div>
+      <div id="lista-sabores"></div>
+    </div>
+  </section>
+
+  <section class="secao secao--alt" id="combos">
+    <div class="envoltorio">
+      <div class="secao__cabeca">
+        <p class="rotulo">02 — Combos</p>
+        <h2>Quanto mais, melhor</h2>
+      </div>
+      <div id="lista-combos" class="grade-fios grade-fios--3"></div>
+    </div>
+  </section>
+
+  <section class="secao" id="entrega">
+    <div class="envoltorio">
+      <div class="secao__cabeca">
+        <p class="rotulo">03 — Entrega e retirada</p>
+        <h2>Como chega até você</h2>
+      </div>
+      <div id="tabela-entrega" class="tabela-dados"></div>
+    </div>
+  </section>
+
+  <section class="secao secao--alt" id="avaliacoes">
+    <div class="envoltorio">
+      <div class="secao__cabeca">
+        <p class="rotulo">04 — Quem já provou</p>
+        <h2>Avaliações</h2>
+      </div>
+      <div id="lista-avaliacoes"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <div class="envoltorio">
+    <p class="logo" data-campo="marca.nome">SacoPex</p>
+    <div id="rodape-contato" class="tabela-dados"></div>
+  </div>
+</footer>
+
+<div class="barra-pedido">
+  <span class="rotulo" id="barra-resumo">Escolha um sabor</span>
+  <a class="botao botao--principal" id="pedir-barra" href="#sabores">Pedir</a>
+</div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

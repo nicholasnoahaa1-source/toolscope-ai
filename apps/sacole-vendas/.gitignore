@@ -1,0 +1,5 @@
+node_modules
+dist
+
+# Fonte paga: não versionar num repositório público (ver public/fontes/LEIA-ME.md)
+public/fontes/TiemposText-Italic.woff2
