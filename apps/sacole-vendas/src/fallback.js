@@ -41,11 +41,15 @@ export async function montarFallback(container, { reduzido }) {
     return
   }
 
-  if (await existe('/imagens/sacole-oreo-produto.png')) {
+  if (await existe('/imagens/sacole-oreo-produto.webp')) {
     const img = new Image()
     img.className = 'heroi__fallback'
-    img.src = '/imagens/sacole-oreo-produto.png'
-    img.alt = 'Sacolé artesanal de creme com pedaços de biscoito.'
+    img.decoding = 'async'
+    img.src = '/imagens/sacole-oreo-produto.webp'
+    img.srcset = '/imagens/sacole-oreo-produto-sm.webp 600w, /imagens/sacole-oreo-produto.webp 1200w'
+    img.sizes = '(min-width: 60rem) 50vw, 100vw'
+    img.alt = 'Uma mão segura um sacolé de creme claro salpicado de pedaços de ' +
+              'biscoito de chocolate, com o saquinho torcido e amarrado no topo.'
     container.appendChild(img)
     return
   }
