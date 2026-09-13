@@ -1,104 +1,143 @@
 import { animate, scroll } from 'motion'
 
 /**
- * Palco do herói: a foto do produto encenada em 3D por transformações CSS.
+ * Palco do herói: sequência de quadros do sacolé girando, percorrida pelo
+ * scroll — a rolagem da página é o que gira a peça.
  *
- * Nada aqui é WebGL. A sensação de profundidade vem de três camadas num mesmo
- * espaço com `perspective`: um fundo desfocado que anda mais devagar, a placa
- * com a foto girando em dois eixos, e uma sombra de contato que acompanha.
+ * A foto fica na marcação e aparece de imediato; os quadros entram depois,
+ * quando terminam de decodificar, e só então o canvas assume. A primeira
+ * dobra nunca espera por eles.
  *
- * O scroll e o ponteiro só escrevem valores-alvo; um único laço interpola até
- * eles. É o que mantém o movimento fluido — reagir direto no evento trava.
+ * O scroll e o ponteiro só escrevem valores-alvo; um laço único interpola até
+ * eles e redesenha apenas quando o quadro muda. Reagir direto no evento trava.
  */
+
+const QUADROS = 36
+const caminho = (i, pequeno) =>
+  `/frames/${String(i).padStart(4, '0')}${pequeno ? '-sm' : ''}.webp`
 
 const juntar = (a, b, t) => a + (b - a) * t
 const limitar = (v, min, max) => Math.min(Math.max(v, min), max)
 
+function carregar(url) {
+  return new Promise((ok, erro) => {
+    const img = new Image()
+    img.decoding = 'async'
+    img.onload = () => ok(img)
+    img.onerror = erro
+    img.src = url
+  })
+}
+
 export function montarPalco(palco, { reduzido }) {
   const placa = palco.querySelector('.palco__placa')
-  const fundo = palco.querySelector('.palco__fundo')
+  const canvas = palco.querySelector('.palco__quadros')
   const sombra = palco.querySelector('.palco__sombra')
-  const brilho = palco.querySelector('.palco__brilho')
 
+  // Movimento reduzido: a foto fica, os quadros nem são baixados.
   if (reduzido) {
     palco.dataset.estado = 'estatico'
     return { impulso() {}, destruir() {} }
   }
 
-  // alvos escritos pelos eventos; `atual` é o que de fato vai para a tela
   const alvo = { progresso: 0, giroX: 0, giroY: 0 }
   const atual = { progresso: 0, giroX: 0, giroY: 0 }
-  let impulsoGiro = 0
+  let deslize = 0          // giro extra vindo do clique num sabor
+  let imagens = null
+  let ultimoIndice = -1
+  let vivo = true
 
   const cancelarScroll = scroll(
     (progresso) => { alvo.progresso = progresso },
     { target: palco, offset: ['start end', 'end start'] }
   )
 
-  // O ponteiro inclina a peça como se você a estivesse virando na mão.
   function aoMover(e) {
+    if (e.pointerType === 'touch') return   // no toque, o gesto é da página
     const r = palco.getBoundingClientRect()
-    const x = (e.clientX - r.left) / r.width - 0.5
-    const y = (e.clientY - r.top) / r.height - 0.5
-    alvo.giroY = limitar(x, -0.5, 0.5) * 26
-    alvo.giroX = limitar(-y, -0.5, 0.5) * 14
+    alvo.giroY = limitar((e.clientX - r.left) / r.width - 0.5, -0.5, 0.5) * 18
+    alvo.giroX = limitar(0.5 - (e.clientY - r.top) / r.height, -0.5, 0.5) * 10
   }
-  function aoSair() { alvo.giroY = 0; alvo.giroX = 0 }
-
-  // `pointermove` no palco inteiro cobre mouse e caneta; no toque o gesto
-  // vertical continua rolando a página, então não interceptamos nada.
-  palco.addEventListener('pointermove', (e) => { if (e.pointerType !== 'touch') aoMover(e) })
+  const aoSair = () => { alvo.giroY = 0; alvo.giroX = 0 }
+  palco.addEventListener('pointermove', aoMover)
   palco.addEventListener('pointerleave', aoSair)
 
-  let vivo = true
+  const ctx = canvas.getContext('2d')
+
+  function desenhar(indice) {
+    if (!imagens || indice === ultimoIndice) return
+    ultimoIndice = indice
+    const img = imagens[indice]
+    const escala = Math.min(canvas.width / img.width, canvas.height / img.height)
+    const w = img.width * escala
+    const h = img.height * escala
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h)
+  }
+
+  function redimensionar() {
+    const r = canvas.getBoundingClientRect()
+    const dpr = Math.min(devicePixelRatio, 2)
+    canvas.width = Math.round(r.width * dpr)
+    canvas.height = Math.round(r.height * dpr)
+    ultimoIndice = -1                        // força redesenho na nova resolução
+  }
+  const ro = new ResizeObserver(redimensionar)
+  ro.observe(canvas)
+
   function laco() {
     if (!vivo) return
     requestAnimationFrame(laco)
 
-    atual.progresso = juntar(atual.progresso, alvo.progresso, 0.09)
+    atual.progresso = juntar(atual.progresso, alvo.progresso, 0.1)
     atual.giroX = juntar(atual.giroX, alvo.giroX, 0.12)
     atual.giroY = juntar(atual.giroY, alvo.giroY, 0.12)
-    impulsoGiro *= 0.92
+    deslize *= 0.94
 
-    // 0 quando o palco entra pela base da tela, 1 quando sai pelo topo.
-    const p = atual.progresso
-    // -1 no começo, 0 no meio da tela, +1 ao sair: o meio é a pose de repouso
-    const centrado = p * 2 - 1
+    // uma volta e meia da peça ao longo da travessia do palco pela tela
+    const voltas = atual.progresso * 1.5 + atual.giroY / 90 + deslize
+    desenhar(((Math.round(voltas * QUADROS) % QUADROS) + QUADROS) % QUADROS)
 
-    const giroY = centrado * -18 + atual.giroY + impulsoGiro
-    const giroX = centrado * 5 + atual.giroX
-    const escala = 1.04 - Math.abs(centrado) * 0.12
-    const subida = centrado * -6
-
+    // a inclinação e a escala continuam em CSS: dão profundidade sem custar
+    // quadros novos
+    const centrado = atual.progresso * 2 - 1
     placa.style.transform =
-      `translate3d(0, ${subida}%, 0) rotateX(${giroX.toFixed(2)}deg) ` +
-      `rotateY(${giroY.toFixed(2)}deg) scale(${escala.toFixed(3)})`
+      `translate3d(0, ${(centrado * -5).toFixed(2)}%, 0) ` +
+      `rotateX(${atual.giroX.toFixed(2)}deg) rotateY(${(atual.giroY * 0.35).toFixed(2)}deg) ` +
+      `scale(${(1.03 - Math.abs(centrado) * 0.1).toFixed(3)})`
 
-    // o fundo anda menos que a placa: é a separação que cria a profundidade
-    fundo.style.transform =
-      `translate3d(0, ${(centrado * -2).toFixed(2)}%, -180px) scale(${(1.5 + Math.abs(centrado) * 0.1).toFixed(3)})`
-
-    // a sombra encolhe e clareia quando a peça "sobe"
     const longe = Math.abs(centrado)
-    sombra.style.transform =
-      `translate3d(${(giroY * 0.5).toFixed(1)}px, 0, 0) scale(${(1 - longe * 0.18).toFixed(3)}, ${(1 - longe * 0.3).toFixed(3)})`
-    sombra.style.opacity = (0.42 - longe * 0.18).toFixed(3)
-
-    // o brilho varre a peça conforme ela gira — é o que lê como plástico
-    brilho.style.setProperty('--varredura', `${50 + giroY * 1.6}%`)
-    brilho.style.opacity = (0.35 + Math.abs(giroY) / 120).toFixed(3)
+    sombra.style.transform = `scale(${(1 - longe * 0.18).toFixed(3)}, ${(1 - longe * 0.3).toFixed(3)})`
+    sombra.style.opacity = (0.4 - longe * 0.18).toFixed(3)
   }
   requestAnimationFrame(laco)
 
+  // Os quadros entram depois da primeira dobra; até lá a foto segura a cena.
+  const pequeno = matchMedia('(max-width: 60rem)').matches
+  const baixar = () =>
+    Promise.all(Array.from({ length: QUADROS }, (_, i) => carregar(caminho(i + 1, pequeno))))
+      .then((lista) => {
+        if (!vivo) return
+        imagens = lista
+        redimensionar()
+        palco.dataset.estado = 'quadros'
+      })
+      .catch(() => { /* sem quadros a foto continua valendo */ })
+
+  if ('requestIdleCallback' in window) requestIdleCallback(baixar, { timeout: 2500 })
+  else addEventListener('load', baixar)
+
   return {
-    /** Empurrão de rotação ao trocar de sabor — a peça reage ao clique. */
+    /** Empurrão de giro ao trocar de sabor: a peça reage ao clique. */
     impulso() {
-      impulsoGiro = 16
-      animate(placa, { filter: ['brightness(1.12)', 'brightness(1)'] }, { duration: 0.5 })
+      deslize = 0.18
+      animate(placa, { filter: ['brightness(1.1)', 'brightness(1)'] }, { duration: 0.45 })
     },
     destruir() {
       vivo = false
       cancelarScroll?.()
+      ro.disconnect()
+      palco.removeEventListener('pointermove', aoMover)
       palco.removeEventListener('pointerleave', aoSair)
     },
   }

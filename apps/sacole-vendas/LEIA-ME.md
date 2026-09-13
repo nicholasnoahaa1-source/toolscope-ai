@@ -44,19 +44,35 @@ aparelho real.
 
 ## Movimento
 
-Não há WebGL. O herói é a foto do produto encenada em 3D por transformações
-CSS, em `src/palco.js`:
+Não há WebGL. O herói é uma **sequência de quadros percorrida pelo scroll** —
+rolar a página gira o sacolé. `src/palco.js` desenha o quadro atual num canvas;
+o scroll e o ponteiro só escrevem valores-alvo e um laço único interpola até
+eles, redesenhando só quando o índice muda.
 
-- Três camadas num mesmo espaço com `perspective` — fundo desfocado, placa com
-  a foto, sombra de contato — separadas no eixo Z.
-- O scroll e o ponteiro só escrevem valores-alvo; um laço único interpola até
-  eles. Reagir direto no evento trava o movimento.
-- A placa gira nos dois eixos, escala e sobe conforme o scroll; a sombra
-  encolhe e clareia junto; uma varredura de luz atravessa a peça ao girar.
-- Trocar de sabor dá um empurrão de rotação e um clarão curto na placa.
-- `prefers-reduced-motion` desliga tudo: a foto fica parada e centrada, sem
-  camadas nem brilho.
+A foto está na marcação e aparece de imediato; os quadros entram depois, em
+`requestIdleCallback`, e só então o canvas assume. A primeira dobra nunca
+espera pela sequência, e se ela falhar a foto continua valendo.
 
-A foto é do sabor Oreo. Trocar de sabor **não** recolore a imagem — seria
-inventar uma foto de produto que não existe. Para os outros sabores mostrarem
-a própria imagem, é preciso fotografá-los.
+`prefers-reduced-motion` não baixa nenhum quadro: a foto fica parada e
+centrada.
+
+## Os quadros
+
+`public/frames/` é **gerado**, não capturado — 36 quadros mais as versões de
+meia resolução para celular, ~720 kB no total.
+
+    python3 ferramentas/gerar-frames.py
+
+O script mapeia um trecho limpo do corpo do sacolé na foto sobre um cilindro
+resolvido analiticamente em numpy, com iluminação própria. A textura é do
+produto real: o mesmo creme, os mesmos pedaços de biscoito.
+
+Limite honesto: a foto tem a mão na frente e luz de fim de tarde, então o
+trecho aproveitável é pequeno e precisa ser espelhado para fechar os 360° — a
+simetria fica perceptível quando a peça para. **Um vídeo de 3 segundos girando
+o sacolé na mão substitui esses quadros pelo produto de verdade** e fica muito
+melhor; o resto do mecanismo não muda.
+
+A foto e os quadros são do sabor Oreo. Trocar de sabor **não** os recolore:
+seria inventar imagem de produto que não existe. Coco e maracujá precisam da
+própria captura.

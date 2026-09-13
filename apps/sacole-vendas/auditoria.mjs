@@ -80,11 +80,19 @@ for (const w of [320,375,768,1280,1600]) {
   await pg.close()
 }
 
-// prefers-reduced-motion desliga a cena 3D
+// prefers-reduced-motion: nenhum quadro baixado e a foto no lugar, parada.
+// Contar elementos <canvas> não serve mais: ele existe na marcação e fica
+// apenas oculto — o que importa é que a sequência nem chega a ser buscada.
 const pr = await b.newPage({ viewport:{width:375,height:812}, reducedMotion:'reduce' })
 await pr.goto('http://localhost:4173/', { waitUntil:'networkidle' })
-await pr.waitForTimeout(2500)
-console.log('reduced-motion — canvas WebGL montado:', await pr.locator('canvas').count())
+await pr.waitForTimeout(2600)
+console.log('reduced-motion —',
+  'estado:', await pr.getAttribute('#palco','data-estado'),
+  '| quadros baixados:', await pr.evaluate(() =>
+    performance.getEntriesByType('resource').filter(r => r.name.includes('/frames/')).length),
+  '| foto visível:', await pr.locator('.palco__foto').isVisible(),
+  '| transform da placa:', await pr.evaluate(() =>
+    getComputedStyle(document.querySelector('.palco__placa')).transform))
 await pr.close()
 
 await b.close()
