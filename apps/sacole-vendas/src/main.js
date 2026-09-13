@@ -1,6 +1,6 @@
 import { animate, inView, stagger } from 'motion'
 import { marca, contato, sabores, combos, entrega, operacao, avaliacoes, pendente, faltando } from './dados.js'
-import { montarFallback } from './fallback.js'
+import { montarPalco } from './palco.js'
 import './estilo.css'
 
 const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -71,7 +71,7 @@ if (sabores.length) {
       saborEscolhido = s
       listaSabores.querySelectorAll('.sabor').forEach((o) => o.setAttribute('aria-pressed', 'false'))
       b.setAttribute('aria-pressed', 'true')
-      cena?.trocarSabor(s)
+      palco?.impulso()
       atualizarBotoes()
     })
     listaSabores.appendChild(b)
@@ -188,32 +188,5 @@ if (!reduzido) {
   animate('.heroi__texto > *', { opacity: [0, 1], y: [20, 0] }, { delay: stagger(0.07), duration: 0.6 })
 }
 
-/* ---------------- 3D sob demanda, nunca segurando a primeira dobra ---------------- */
-const palco = document.getElementById('palco-3d')
-let cena = null
-let degradado = false
-
-async function degradar(motivo) {
-  if (degradado) return
-  degradado = true
-  cena?.destruir()
-  cena = null
-  if (import.meta.env.DEV) console.info('3D desligado:', motivo)
-  await montarFallback(palco, { reduzido })
-}
-
-async function iniciar3D() {
-  if (reduzido) return degradar('prefers-reduced-motion')
-  const { suportaWebGL2, montarCena } = await import('./cena.js')
-  if (!suportaWebGL2()) return degradar('sem-webgl2')
-  if (!sabores.length) return degradar('sem-sabores')
-  try {
-    cena = montarCena(palco, { saborInicial: saborEscolhido, aoDegradar: degradar })
-  } catch (erro) {
-    degradar(erro)
-  }
-}
-
-// espera a página estar pintada e útil antes de tocar no 3D
-if ('requestIdleCallback' in window) requestIdleCallback(() => iniciar3D(), { timeout: 2000 })
-else addEventListener('load', iniciar3D)
+/* ---------------- palco: a foto animada pelo scroll ---------------- */
+const palco = montarPalco(document.getElementById('palco'), { reduzido })

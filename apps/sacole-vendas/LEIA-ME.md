@@ -42,14 +42,21 @@ desligamento do 3D com `prefers-reduced-motion`.
 Fora do alcance deste script: os 60fps em celular intermediário — precisa de
 aparelho real.
 
-## 3D
+## Movimento
 
-- `MeshPhysicalMaterial` com `transmission`/`thickness`/`ior` 1.45 no saquinho;
-  creme como geometria própria; pedaços em `InstancedMesh`.
-- Câmera dirigida pelo scroll com lerp, nunca presa ao evento.
-- Arrastar gira, soltar volta à pose de repouso com inércia; `touch-action: pan-y`
-  mantém o scroll vertical do celular.
-- Sabor troca a cor do creme e dos pedaços com transição animada.
-- Cai para os frames quando: sem WebGL2, `prefers-reduced-motion`, ou menos de
-  30fps por mais de 2s. A cena carrega em `requestIdleCallback`, depois da
-  primeira dobra, em chunk separado.
+Não há WebGL. O herói é a foto do produto encenada em 3D por transformações
+CSS, em `src/palco.js`:
+
+- Três camadas num mesmo espaço com `perspective` — fundo desfocado, placa com
+  a foto, sombra de contato — separadas no eixo Z.
+- O scroll e o ponteiro só escrevem valores-alvo; um laço único interpola até
+  eles. Reagir direto no evento trava o movimento.
+- A placa gira nos dois eixos, escala e sobe conforme o scroll; a sombra
+  encolhe e clareia junto; uma varredura de luz atravessa a peça ao girar.
+- Trocar de sabor dá um empurrão de rotação e um clarão curto na placa.
+- `prefers-reduced-motion` desliga tudo: a foto fica parada e centrada, sem
+  camadas nem brilho.
+
+A foto é do sabor Oreo. Trocar de sabor **não** recolore a imagem — seria
+inventar uma foto de produto que não existe. Para os outros sabores mostrarem
+a própria imagem, é preciso fotografá-los.

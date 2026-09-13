@@ -60,10 +60,18 @@
           <a class="botao botao--secundario" href="#sabores">Ver sabores</a>
         </div>
       </div>
-      <div class="heroi__palco">
-        <div id="palco-3d" role="img"
-             aria-label="Sacolé em 3D girando sobre mármore. Arraste para girar."></div>
-        <noscript><p class="envoltorio">Ative o JavaScript para ver o sacolé em 3D.</p></noscript>
+      <div class="heroi__palco palco" id="palco">
+        <div class="palco__fundo" aria-hidden="true"></div>
+        <figure class="palco__placa">
+          <img class="palco__foto"
+               src="/imagens/sacole-oreo-produto.webp"
+               srcset="/imagens/sacole-oreo-produto-sm.webp 600w, /imagens/sacole-oreo-produto.webp 1200w"
+               sizes="(min-width: 60rem) 50vw, 100vw"
+               width="1200" height="1600" decoding="async"
+               alt="Uma mão segura um sacolé de creme claro salpicado de pedaços de biscoito de chocolate, com o saquinho torcido e amarrado no topo.">
+          <span class="palco__brilho" aria-hidden="true"></span>
+        </figure>
+        <div class="palco__sombra" aria-hidden="true"></div>
       </div>
     </div>
   </section>
