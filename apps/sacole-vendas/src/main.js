@@ -81,6 +81,12 @@ if (sabores.length) {
 }
 
 /* ---------------- combos ---------------- */
+/** Seção sem conteúdo real não vira placeholder: sai da página e da navegação. */
+function removerSecao(id) {
+  document.getElementById(id)?.remove()
+  document.querySelectorAll(`a[href="#${id}"]`).forEach((a) => a.remove())
+}
+
 const listaCombos = document.getElementById('lista-combos')
 if (combos.length) {
   combos.forEach((c) => {
@@ -92,7 +98,7 @@ if (combos.length) {
     listaCombos.appendChild(d)
   })
 } else {
-  listaCombos.innerHTML = '<p class="pendencia">Combos a preencher em src/dados.js</p>'
+  removerSecao('combos')
 }
 
 /* ---------------- entrega, operação, rodapé ---------------- */

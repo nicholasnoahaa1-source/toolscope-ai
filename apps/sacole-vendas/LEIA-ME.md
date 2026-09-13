@@ -20,9 +20,13 @@ Vite + Three.js + Motion, tudo servido localmente (sem CDN, sem Google Fonts).
 3. **Fallback** — `public/frames/0001.webp` … `0145.webp` (720px) e
    `public/imagens/sacole-oreo-produto.png`. Sem eles o palco fica vazio e a
    página continua vendendo normalmente.
-4. **Modelo** — o sacolé é gerado por código em `src/cena.js`. Para trocar pelo
-   `.glb`, substituir `construirSacole()` por um GLTFLoader mantendo os meshes
-   com os nomes `saquinho`, `creme` e `pedacos`.
+4. **Modelo** — o sacolé é gerado por código em `src/cena.js`. Existe um `.glb`
+   gerado por IA a partir da foto do produto (Higgsfield, modelo `sam_3_3d`),
+   mas ele é uma peça única texturizada: serviria de estátua, não permitiria
+   trocar o creme e os pedaços por sabor, que é o que justifica ser 3D em vez
+   de foto. Para usá-lo mesmo assim, baixe o arquivo em `public/modelo/` e
+   troque `construirSacole()` por um GLTFLoader mantendo os nomes `saquinho`,
+   `creme` e `pedacos`.
 
 ## Auditoria dos critérios de aceite
 

@@ -1,62 +1,80 @@
 /**
- * DADOS REAIS DA MARCA — ÚNICA FONTE DE VERDADE DA PÁGINA.
+ * DADOS REAIS DA SACOPEX — ÚNICA FONTE DE VERDADE DA PÁGINA.
  *
- * Tudo aqui começa `null` de propósito. Nada nesta página pode ser inventado:
- * enquanto um campo for `null`, a página não exibe um valor falso — ela mostra
- * o campo como pendente (em desenvolvimento) ou omite a seção (em produção).
- *
- * Preencha e nada mais precisa ser tocado no código.
+ * Nada aqui pode ser inventado. Campo `null` não vira texto falso: some da
+ * página em produção e aparece como pendência em desenvolvimento.
  */
 
 export const marca = {
-  nome: null,          // ex.: "Sacolé da Vila"
-  slogan: null,        // ex.: "Fruta de verdade, feito no dia" — ou deixe null
-  cidade: null,        // ex.: "Vila Nova, Goiânia"
-  diferencial: null,   // o que você faz que a concorrência não faz
+  nome: 'SacoPex',
+  slogan: null,
+  cidade: 'Curicica, Jacarepaguá',
+  diferencial:
+    'Sacolé feito à mão, em casa, poucos por vez — cada saquinho é batido, ' +
+    'enchido e amarrado um a um, não sai de fábrica.',
 }
 
 export const contato = {
-  whatsapp: null,      // só dígitos, ex.: "5562999998888"
-  instagram: null,     // ex.: "@sacoledavila"
+  whatsapp: '5521966670595',
+  instagram: null,
 }
 
 /**
  * Cada sabor pilota o 3D: `creme` é a cor do recheio, `pedacos` a cor dos
- * pedaços suspensos, `pedacosVisiveis` liga/desliga o InstancedMesh.
+ * pedaços suspensos. Preço: fruta/normal R$ 5, gourmet R$ 6.
+ *
+ * A lista abaixo tem só os sabores confirmados. Para acrescentar outro,
+ * copie um bloco e ajuste nome, preço e as duas cores — o 3D acompanha.
  */
 export const sabores = [
-  // {
-  //   id: 'oreo',
-  //   nome: 'Oreo',
-  //   preco: 5.0,                 // por unidade, em reais
-  //   creme: '#f3ece0',
-  //   pedacos: '#1b1b1d',
-  //   pedacosVisiveis: true,
-  //   descricao: null,            // uma linha curta, opcional
-  // },
+  {
+    id: 'coco',
+    nome: 'Coco',
+    preco: 5,
+    creme: '#f7f3ea',
+    pedacos: '#c2ab86',
+    pedacosVisiveis: true,
+    descricao: null,
+  },
+  {
+    id: 'maracuja',
+    nome: 'Maracujá',
+    preco: 5,
+    creme: '#f7d98c',
+    pedacos: '#3f2c1b',
+    pedacosVisiveis: true,
+    descricao: null,
+  },
+  {
+    id: 'oreo',
+    nome: 'Oreo',
+    preco: 6,
+    creme: '#f0e9dd',
+    pedacos: '#1b1b1d',
+    pedacosVisiveis: true,
+    descricao: null,
+  },
 ]
 
-export const combos = [
-  // { quantidade: 10, preco: 45 },
-]
+/** Sem combos por enquanto. */
+export const combos = []
 
 export const entrega = {
-  bairros: null,       // ex.: "Vila Nova, Setor Sul e Jardim Botânico"
-  taxa: null,          // ex.: "R$ 5 por entrega" ou "grátis acima de 20 unidades"
-  prazo: null,         // ex.: "até 2h"
-  retirada: null,      // endereço ou "a combinar pelo WhatsApp"
+  bairros: 'Curicica e Jacarepaguá',
+  taxa: null,
+  prazo: null,
+  retirada: 'A combinar pelo WhatsApp — você busca ou eu levo',
 }
 
 export const operacao = {
-  horario: null,       // ex.: "Seg a sáb, 10h às 20h"
-  pagamento: null,     // ex.: "Pix, cartão e dinheiro"
-  pedidoMinimo: null,  // ex.: "10 unidades"
+  horario: 'Pedidos pelo WhatsApp a qualquer hora',
+  pagamento: 'Pix, dinheiro e cartão (cartão com juros)',
+  pedidoMinimo: 'Sem pedido mínimo',
 }
 
 /** Avaliações reais. Vazio = a seção vira convite para o cliente enviar a dele. */
 export const avaliacoes = []
 
-/** true quando cada campo obrigatório estiver preenchido. */
 export const pendente = (v) => v === null || v === undefined || v === ''
 
 export const faltando = () => {
@@ -65,7 +83,6 @@ export const faltando = () => {
     'marca.cidade': marca.cidade,
     'marca.diferencial': marca.diferencial,
     'contato.whatsapp': contato.whatsapp,
-    'contato.instagram': contato.instagram,
     'entrega.bairros': entrega.bairros,
     'entrega.taxa': entrega.taxa,
     'entrega.prazo': entrega.prazo,
@@ -76,6 +93,5 @@ export const faltando = () => {
   }
   const lista = Object.entries(alvos).filter(([, v]) => pendente(v)).map(([k]) => k)
   if (!sabores.length) lista.push('sabores')
-  if (!combos.length) lista.push('combos')
   return lista
 }

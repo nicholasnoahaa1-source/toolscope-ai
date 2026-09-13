@@ -229,6 +229,9 @@ body { padding-bottom: 76px; }
 }
 .sabor:hover .sabor__nome { color: var(--acento-texto); }
 .sabor[aria-pressed='true'] { background: var(--solido); color: var(--sobre-solido); padding-inline: 0.9rem; }
+/* No estado pressionado o fundo é o painel sólido: o acento do hover não tem
+   contraste ali, então a linha selecionada mantém a cor do painel. */
+.sabor[aria-pressed='true']:hover .sabor__nome { color: inherit; }
 .sabor__nome { font-family: var(--serif); font-style: italic; font-size: 1.4rem; }
 .sabor__preco { font-family: var(--serif); font-style: italic; white-space: nowrap; }
 

@@ -11,54 +11,99 @@ import * as THREE from 'three'
 
 const TAU = Math.PI * 2
 
-/** Perfil de revolução do sacolé: [raio, altura] do fundo selado ao topo torcido. */
-function perfilSacole(segmentos = 64) {
+/**
+ * Perfil de revolução do sacolé, do fundo selado ao rabicho torcido.
+ * Proporção tirada da foto do produto: comprido e fino, não um cilindro gordo
+ * — cerca de 4,5 vezes mais alto que largo.
+ */
+const RAIO = 0.29
+const ALTURA = 2.6
+/** Raio do creme, como fração do saquinho — o resto é plástico à vista. */
+const CREME = 0.88
+
+function perfilSacole(segmentos = 96) {
   const pontos = []
   for (let i = 0; i <= segmentos; i++) {
     const t = i / segmentos
-    // base arredondada -> corpo reto -> estrangulamento no topo
     let raio
-    if (t < 0.06) raio = Math.sin((t / 0.06) * (Math.PI / 2)) * 0.5
-    else if (t < 0.82) raio = 0.5 + Math.sin(t * Math.PI * 2) * 0.012
-    else raio = 0.5 * (1 - Math.pow((t - 0.82) / 0.18, 1.4) * 0.93)
-    pontos.push(new THREE.Vector2(Math.max(raio, 0.02), t * 2.6 - 1.3))
+    if (t < 0.05) {
+      // fundo selado: a solda achata o saquinho numa aba arredondada
+      raio = RAIO * Math.sin((t / 0.05) * (Math.PI / 2))
+    } else if (t < 0.78) {
+      // corpo cheio, com a ondulação leve do plástico esticado
+      raio = RAIO * (1 + Math.sin(t * 22) * 0.012)
+    } else if (t < 0.88) {
+      // ombro: o conteúdo acaba e o saquinho fecha
+      const k = (t - 0.78) / 0.1
+      raio = RAIO * (1 - k * k * 0.72)
+    } else {
+      // rabicho torcido e amarrado
+      const k = (t - 0.88) / 0.12
+      raio = RAIO * 0.28 * (1 - k * 0.72) * (1 + Math.sin(k * 30) * 0.22)
+    }
+    pontos.push(new THREE.Vector2(Math.max(raio, 0.012), t * ALTURA - ALTURA / 2))
   }
   return pontos
 }
 
-function construirSacole(cores) {
+/**
+ * `transmission` do Three.js desenha num render target de meio-float. Sem
+ * EXT_color_buffer_float o passe falha calado e o saquinho vira um bloco
+ * branco opaco, escondendo justamente o que a página quer mostrar. Nesse caso
+ * usamos transparência simples: menos bonito, mas deixa ver o recheio.
+ */
+function materialSaquinho(renderer) {
+  const base = {
+    roughness: 0.07,
+    ior: 1.45,
+    metalness: 0,
+    clearcoat: 1,
+    clearcoatRoughness: 0.08,
+    color: 0xffffff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+  }
+  const temFloat = !!renderer.getContext().getExtension('EXT_color_buffer_float')
+  return new THREE.MeshPhysicalMaterial(
+    temFloat
+      ? { ...base, transmission: 1, thickness: 0.06 }
+      : { ...base, opacity: 0.22, roughness: 0.12 }
+  )
+}
+
+function construirSacole(cores, renderer) {
   const grupo = new THREE.Group()
 
+  // Saquinho: plástico fino e quase limpo. `thickness` alto lê como vidro
+  // maciço e esconde o recheio — o que importa aqui é ver através.
   const saquinho = new THREE.Mesh(
-    new THREE.LatheGeometry(perfilSacole(), 96),
-    new THREE.MeshPhysicalMaterial({
-      transmission: 0.94,
-      thickness: 0.45,
-      roughness: 0.16,
-      ior: 1.45,
-      metalness: 0,
-      clearcoat: 0.7,
-      clearcoatRoughness: 0.25,
-      color: 0xffffff,
-      side: THREE.DoubleSide,
-      transparent: true,
-    })
+    new THREE.LatheGeometry(perfilSacole(), 128),
+    materialSaquinho(renderer)
   )
   saquinho.name = 'saquinho'
-  saquinho.renderOrder = 2
+  saquinho.renderOrder = 3
 
+  // O creme é uma peça própria, um pouco menor, para sobrar plástico à vista.
   const creme = new THREE.Mesh(
-    new THREE.LatheGeometry(perfilSacole().map((p) => new THREE.Vector2(p.x * 0.93, p.y * 0.985)), 72),
-    new THREE.MeshStandardMaterial({ color: new THREE.Color(cores.creme), roughness: 0.85, metalness: 0 })
+    new THREE.LatheGeometry(
+      perfilSacole(64).map((p) => new THREE.Vector2(p.x * CREME, p.y * 0.995)),
+      96
+    ),
+    new THREE.MeshStandardMaterial({
+      color: new THREE.Color(cores.creme),
+      roughness: 1,
+      metalness: 0,
+    })
   )
   creme.name = 'creme'
   creme.renderOrder = 1
 
-  // Pedaços de biscoito/fruta suspensos no creme, distribuídos dentro do volume.
-  const N = 90
+  // Pedaços suspensos, encostados na parede para aparecerem pelo plástico.
+  const N = 150
   const pedacos = new THREE.InstancedMesh(
-    new THREE.BoxGeometry(0.07, 0.03, 0.06),
-    new THREE.MeshStandardMaterial({ color: new THREE.Color(cores.pedacos), roughness: 0.95 }),
+    new THREE.BoxGeometry(0.038, 0.018, 0.034),
+    new THREE.MeshStandardMaterial({ color: new THREE.Color(cores.pedacos), roughness: 1 }),
     N
   )
   pedacos.name = 'pedacos'
@@ -66,19 +111,24 @@ function construirSacole(cores) {
   const q = new THREE.Quaternion()
   const e = new THREE.Euler()
   const pos = new THREE.Vector3()
-  const um = new THREE.Vector3(1, 1, 1)
+  const escala = new THREE.Vector3()
+  const baixo = -ALTURA / 2 + 0.06
+  const topo = ALTURA * 0.78 - ALTURA / 2
   for (let i = 0; i < N; i++) {
-    const y = -1.22 + Math.random() * 2.3
-    const limite = 0.43 * (y > 1.0 ? Math.max(0.08, 1 - (y - 1.0) / 0.35) : 1)
-    const r = Math.sqrt(Math.random()) * limite
+    const y = baixo + Math.random() * (topo - baixo)
+    // Os pedaços vivem na casca do creme, atravessando a superfície: dentro
+    // dele o creme opaco os esconderia, e é justamente vê-los pelo plástico
+    // que faz a peça parecer sacolé e não vela.
+    const r = (CREME - 0.1 + Math.random() * 0.08) * RAIO
     const a = Math.random() * TAU
     pos.set(Math.cos(a) * r, y, Math.sin(a) * r)
     e.set(Math.random() * TAU, Math.random() * TAU, Math.random() * TAU)
-    m.compose(pos, q.setFromEuler(e), um)
+    const k = 0.7 + Math.random() * 0.8
+    m.compose(pos, q.setFromEuler(e), escala.set(k, k, k))
     pedacos.setMatrixAt(i, m)
   }
   pedacos.instanceMatrix.needsUpdate = true
-  pedacos.renderOrder = 1
+  pedacos.renderOrder = 2
 
   grupo.add(creme, pedacos, saquinho)
   return { grupo, saquinho, creme, pedacos }
@@ -133,7 +183,7 @@ function chaoMarmore() {
     new THREE.MeshStandardMaterial({ map: tex, roughness: 0.55, metalness: 0 })
   )
   chao.rotation.x = -Math.PI / 2
-  chao.position.y = -1.34
+  chao.position.y = -ALTURA / 2 - 0.02
   chao.receiveShadow = true
   return chao
 }
@@ -167,13 +217,13 @@ export function montarCena(container, { saborInicial, aoDegradar }) {
   luzEstudio(cena)
   cena.add(chaoMarmore())
 
-  const sacole = construirSacole(saborInicial)
+  const sacole = construirSacole(saborInicial, renderer)
   sacole.grupo.traverse((o) => { o.castShadow = true })
   cena.add(sacole.grupo)
 
   // ---- estado de animação ----
-  const alvo = { giro: 0, distancia: 6.4, altura: 1.1, foco: 0 }
-  const atual = { giro: 0, distancia: 6.4, altura: 1.1 }
+  const alvo = { giro: 0, distancia: 5.2, altura: 0.55, foco: 0 }
+  const atual = { giro: 0, distancia: 5.2, altura: 0.55 }
   let inercia = 0
   let arrastando = false
   let xInicial = 0
@@ -234,11 +284,24 @@ export function montarCena(container, { saborInicial, aoDegradar }) {
   }
 
   // ---- laço + vigia de desempenho ----
+  // Os primeiros quadros compilam shader e sobem textura: medir fps aí derruba
+  // a cena por engano num celular que depois sustentaria os 60.
+  const AQUECIMENTO = 3000
+
   let ativo = true
   let quadros = 0
   let janela = performance.now()
   let lentoDesde = 0
   let anterior = performance.now()
+  let inicio = performance.now()
+
+  /** Recomeça a medição — usado ao retomar, senão a pausa conta como lentidão. */
+  function zerarMedicao(agora) {
+    quadros = 0
+    janela = agora
+    lentoDesde = 0
+    anterior = agora
+  }
 
   function laco(agora) {
     if (!ativo) return
@@ -256,8 +319,8 @@ export function montarCena(container, { saborInicial, aoDegradar }) {
     alvo.giro += dt * 0.12   // rotação lenta de vitrine
 
     // o scroll fecha a câmera no detalhe do recheio
-    alvo.distancia = lerp(6.4, 3.1, alvo.foco)
-    alvo.altura = lerp(1.1, 0.1, alvo.foco)
+    alvo.distancia = lerp(5.2, 2.4, alvo.foco)
+    alvo.altura = lerp(0.55, 0.05, alvo.foco)
 
     atual.giro = lerp(atual.giro, alvo.giro, 0.12)
     atual.distancia = lerp(atual.distancia, alvo.distancia, 0.06)
@@ -282,7 +345,9 @@ export function montarCena(container, { saborInicial, aoDegradar }) {
       const fps = (quadros * 1000) / (agora - janela)
       quadros = 0
       janela = agora
-      if (fps < 30) {
+      if (agora - inicio < AQUECIMENTO) {
+        lentoDesde = 0
+      } else if (fps < 30) {
         if (!lentoDesde) lentoDesde = agora
         else if (agora - lentoDesde > 2000) aoDegradar?.('fps')
       } else {
@@ -294,7 +359,11 @@ export function montarCena(container, { saborInicial, aoDegradar }) {
 
   // pausa quando o herói sai da tela — não gasta bateria à toa
   const io = new IntersectionObserver(([entrada]) => {
-    if (entrada.isIntersecting && !ativo) { ativo = true; anterior = performance.now(); requestAnimationFrame(laco) }
+    if (entrada.isIntersecting && !ativo) {
+      ativo = true
+      zerarMedicao(performance.now())
+      requestAnimationFrame(laco)
+    }
     else if (!entrada.isIntersecting) ativo = false
   })
   io.observe(container)
@@ -312,6 +381,8 @@ export function montarCena(container, { saborInicial, aoDegradar }) {
     renderer.dispose()
     renderer.domElement.remove()
   }
+
+  if (import.meta.env.DEV) globalThis.__cena = { renderer, cena, camera, sacole, alvo, atual }
 
   trocarSabor(saborInicial)
   return { trocarSabor, destruir }
