@@ -1,0 +1,246 @@
+/* ---------------------------------------------------------------
+   Fontes servidas localmente. Os arquivos entram em public/fontes/.
+   Tiempos Text é fonte paga (Klim Type Foundry): ok em uso local,
+   confirmar licença antes de publicar.
+   --------------------------------------------------------------- */
+@font-face {
+  font-family: 'Tiempos Text';
+  src: url('/fontes/TiemposText-Italic.woff2') format('woff2'),
+       url('/fontes/TiemposText-Italic.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fontes/Manrope-Variable.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --creme: #f8efdf;
+  --creme-alt: #efe1c4;
+  --navy: #0b2a4a;
+  --terracota: #b5451f;
+
+  --fundo: var(--creme);
+  --fundo-alt: var(--creme-alt);
+  --solido: var(--navy);          /* painéis sólidos */
+  --sobre-solido: var(--creme);
+  --texto: var(--navy);
+  --acento: var(--terracota);
+  --fio: color-mix(in srgb, var(--navy) 28%, transparent);
+
+  --serif: 'Tiempos Text', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --sans: 'Manrope', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  --gutter: clamp(1rem, 4vw, 4rem);
+  color-scheme: light dark;
+}
+
+/* Tema escuro: os painéis sólidos invertem — creme vira o sólido. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='claro']) {
+    --fundo: #071c31;
+    --fundo-alt: #0b2a4a;
+    --solido: #f4e9d5;
+    --sobre-solido: #071c31;
+    --texto: #f6eddd;
+    --acento: #ef8a5e;          /* 4.5:1 sobre o fundo escuro */
+    --fio: color-mix(in srgb, #f6eddd 34%, transparent);
+  }
+}
+:root[data-tema='escuro'] {
+  --fundo: #071c31;
+  --fundo-alt: #0b2a4a;
+  --solido: #f4e9d5;
+  --sobre-solido: #071c31;
+  --texto: #f6eddd;
+  --acento: #ef8a5e;
+  --fio: color-mix(in srgb, #f6eddd 34%, transparent);
+}
+
+*, *::before, *::after { box-sizing: border-box; border-radius: 0 !important; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--sans);
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  line-height: 1.55;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+img, svg, canvas { max-width: 100%; display: block; }
+
+h1, h2, h3, .numeral {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  margin: 0;
+}
+h1 { font-size: clamp(2.75rem, 10vw, 6.5rem); }
+h2 { font-size: clamp(2rem, 6vw, 3.5rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.6rem); }
+
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+.rotulo {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.pular {
+  position: absolute; left: -9999px;
+  background: var(--solido); color: var(--sobre-solido);
+  padding: 0.75rem 1rem; z-index: 100;
+}
+.pular:focus { left: var(--gutter); top: 0.5rem; }
+
+.envoltorio { width: 100%; padding-inline: var(--gutter); margin-inline: auto; max-width: 84rem; }
+
+/* ---------- cabeçalho ---------- */
+.cabecalho {
+  position: sticky; top: 0; z-index: 40;
+  background: var(--fundo);
+  border-bottom: 1px solid var(--fio);
+}
+.cabecalho__linha {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; min-height: 56px;
+}
+.logo { font-family: var(--serif); font-style: italic; font-size: 1.35rem; text-decoration: none; }
+.nav-desktop { display: none; gap: 1.75rem; }
+.nav-desktop a { text-decoration: none; }
+.nav-desktop a:hover { color: var(--acento); }
+
+.botao-icone {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px;
+  background: none; border: 1px solid var(--fio); color: inherit; cursor: pointer;
+}
+.controles { display: flex; gap: 0.5rem; align-items: center; }
+
+.nav-mobile {
+  position: fixed; inset: 56px 0 auto 0; z-index: 39;
+  background: var(--fundo); border-bottom: 1px solid var(--fio);
+  padding: var(--gutter); display: grid; gap: 0.25rem;
+}
+.nav-mobile[hidden] { display: none; }
+.nav-mobile a {
+  text-decoration: none; padding: 0.85rem 0; min-height: 44px;
+  border-bottom: 1px solid var(--fio); display: flex; align-items: center;
+}
+
+/* ---------- herói ---------- */
+.heroi { border-bottom: 1px solid var(--fio); }
+.heroi__grade { display: grid; gap: 0; }
+.heroi__texto { padding-block: clamp(2rem, 6vw, 4.5rem); }
+.heroi__texto p { max-width: 40ch; }
+.heroi__palco { position: relative; min-height: 58vh; border-top: 1px solid var(--fio); }
+#palco-3d { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
+.heroi__fallback { width: 100%; height: 100%; object-fit: contain; }
+
+@media (min-width: 60rem) {
+  .heroi__grade { grid-template-columns: 1fr 1fr; }
+  .heroi__texto { padding-right: clamp(1rem, 3vw, 3rem); border-right: 1px solid var(--fio); }
+  .heroi__palco { min-height: 78vh; border-top: 0; }
+  .nav-desktop { display: flex; }
+  .botao-menu { display: none; }
+}
+
+/* ---------- ações ---------- */
+.acoes { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+.botao {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  min-height: 48px; padding: 0.8rem 1.4rem;
+  font-family: var(--sans); font-weight: 700; font-size: 0.95rem;
+  letter-spacing: 0.04em; text-transform: uppercase; text-decoration: none;
+  border: 1px solid var(--solido); cursor: pointer;
+}
+.botao--principal { background: var(--acento); border-color: var(--acento); color: #fff; }
+.botao--principal:hover { background: color-mix(in srgb, var(--acento) 85%, #000); }
+.botao--secundario { background: transparent; color: var(--texto); }
+.botao--secundario:hover { background: var(--solido); color: var(--sobre-solido); }
+
+/* Barra fixa de pedido no celular — o botão nunca fica fora de alcance. */
+.barra-pedido {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+  background: var(--solido); color: var(--sobre-solido);
+  border-top: 1px solid var(--fio);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 0.6rem var(--gutter);
+}
+.barra-pedido .botao { min-height: 44px; padding: 0.6rem 1.1rem; }
+body { padding-bottom: 76px; }
+@media (min-width: 60rem) {
+  .barra-pedido { display: none; }
+  body { padding-bottom: 0; }
+}
+
+/* ---------- seções ---------- */
+.secao { padding-block: clamp(2.5rem, 8vw, 6rem); border-bottom: 1px solid var(--fio); }
+.secao--alt { background: var(--fundo-alt); }
+.secao__cabeca { display: grid; gap: 0.5rem; margin-bottom: clamp(1.5rem, 4vw, 3rem); }
+
+.grade-fios { display: grid; gap: 0; border-top: 1px solid var(--fio); }
+.grade-fios > * { border-bottom: 1px solid var(--fio); padding-block: 1.25rem; }
+@media (min-width: 48rem) {
+  .grade-fios--2 { grid-template-columns: repeat(2, 1fr); }
+  .grade-fios--3 { grid-template-columns: repeat(3, 1fr); }
+  .grade-fios--2 > *, .grade-fios--3 > * { padding-inline: 1.25rem; border-left: 1px solid var(--fio); }
+  .grade-fios--2 > *:first-child, .grade-fios--3 > *:first-child { border-left: 0; padding-left: 0; }
+}
+
+/* sabores */
+.sabor {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+  width: 100%; min-height: 56px; text-align: left;
+  background: none; border: 0; border-bottom: 1px solid var(--fio);
+  color: inherit; font: inherit; cursor: pointer; padding: 0.9rem 0;
+}
+.sabor:hover .sabor__nome { color: var(--acento); }
+.sabor[aria-pressed='true'] { background: var(--solido); color: var(--sobre-solido); padding-inline: 0.9rem; }
+.sabor__nome { font-family: var(--serif); font-style: italic; font-size: 1.4rem; }
+.sabor__preco { font-family: var(--serif); font-style: italic; white-space: nowrap; }
+
+/* combos */
+.combo { display: grid; gap: 0.35rem; }
+.combo__qtd { font-family: var(--serif); font-style: italic; font-size: clamp(2.5rem, 7vw, 4rem); line-height: 1; }
+
+.tabela-dados { display: grid; gap: 0; border-top: 1px solid var(--fio); }
+.tabela-dados div {
+  display: grid; grid-template-columns: minmax(7rem, 34%) 1fr; gap: 1rem;
+  padding-block: 0.9rem; border-bottom: 1px solid var(--fio); align-items: baseline;
+}
+
+.pendencia {
+  border: 1px dashed var(--acento); color: var(--acento);
+  padding: 0.25rem 0.5rem; font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; display: inline-block;
+}
+
+.aviso-dev {
+  background: var(--acento); color: #fff; padding: 0.75rem var(--gutter); font-size: 0.85rem;
+}
+
+.rodape { background: var(--solido); color: var(--sobre-solido); padding-block: clamp(2rem, 6vw, 4rem); }
+.rodape a { color: inherit; }
+
+.visualmente-oculto {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
