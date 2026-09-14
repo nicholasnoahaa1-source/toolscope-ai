@@ -35,7 +35,12 @@ const prismaStub: any = {
 
 let cachedPrisma: PrismaClient | null = null;
 
-const getPrisma = (): PrismaClient => {
+const getPrisma = (): PrismaClient | any => {
+  // During Vercel builds, always use stub to avoid initialization issues
+  if (process.env.VERCEL === "1") {
+    return prismaStub;
+  }
+
   if (cachedPrisma) return cachedPrisma;
 
   const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
