@@ -224,11 +224,66 @@ Todos os arquivos são públicos dentro da SacoPex — designers, copywriters, p
 
 ---
 
+## SacoPex Content OS — Notion Infrastructure
+
+Infra completa para rastreamento de ciclo de vida de conteúdo em 7 databases relacionais:
+
+### 📦 PRODUTOS
+**URL:** https://app.notion.com/p/5505cef24be64db9977bb14bea08865a
+- Catálogo de sabores e variantes
+- Propriedades: Nome, Sabor, Descrição, Ângulo de Marketing, Público-Alvo, Cor Primária, Status, Data de Lançamento
+- Origem: Sacolé Oreo entry como baseline
+
+### 💡 IDEIAS
+**URL:** https://app.notion.com/p/3d8e1d9ab9834acf9753eb5437a75d15
+- Brainstorm e conceitos pré-campanha
+- Propriedades: Nome, Sabor, Conceito, Emoções (multi-select), Ângulo de Marketing, Status (Brainstorm → Aprovado → Em Progresso → Arquivado)
+- Fluxo: entrada de ideias antes de campanha formal
+
+### 📅 CAMPANHAS
+**URL:** https://app.notion.com/p/c853a2f19d1c44c79e2ce36dc09b9abc
+- Planejamento e gestão de campanhas
+- Propriedades: Nome, Produto, Objetivo (Venda/Engajamento/Awareness/Lançamento), Data de Início/Término, Formatos (multi-select), Status, Orçamento
+- Fluxo: planejamento executivo → criação → publicação
+
+### 📝 CONTEÚDOS
+**URL:** https://app.notion.com/p/7cc6765966f04a6782e63d83787880a7
+- Artefatos gerados (Big Idea, Hooks, Copy, Visual, Prompts)
+- Propriedades: Nome, Tipo (11 variantes), Conteúdo, Status (Rascunho → Revisão → Aprovado → Publicado), Score QC (0-100)
+- Fluxo: saída do Content Engine com validação automática
+
+### 🎨 ASSETS
+**URL:** https://app.notion.com/p/eec22de57ec4464d96b49d09f832a1d0
+- Arquivo de mídia e designs aprovados
+- Propriedades: Nome, Tipo (Imagem/Vídeo/Design/Tipografia/Paleta), Formato (JPG/PNG/MP4/MOV/FIGMA/PSD/SVG), Descrição, Status (Rascunho → Aprovado → Em Uso → Arquivado), URL
+- Fluxo: centralizado para reutilização e versionamento
+
+### 🚀 PUBLICADOS
+**URL:** https://app.notion.com/p/b9425fd6b3b347f79e4b49e2d8837113
+- Log de conteúdo publicado por plataforma
+- Propriedades: Nome, Plataforma (Instagram/TikTok/Facebook/YouTube/LinkedIn), Data de Publicação, Link, Status (Ao Vivo/Arquivado/Removido), Impressões, Engajamento
+- Fluxo: rastreamento post-publicação
+
+### 📊 RESULTADOS
+**URL:** https://app.notion.com/p/edfd7f4f6fe5468b968c3935250581aa
+- Métricas de performance e ROI
+- Propriedades: Nome, Plataforma, Impressões, Cliques, Compartilhamentos, Comentários, Conversões, CTR (%), ROI, Data de Coleta
+- Fluxo: analytics e relatórios de desempenho
+
+### Fluxo Completo de Conteúdo
+```
+PRODUTOS → IDEIAS → CAMPANHAS → CONTEÚDOS → ASSETS → PUBLICADOS → RESULTADOS
+```
+
+Cada record pode ser relacionado entre databases para rastreamento end-to-end.
+
+---
+
 ## Contato / Suporte
 
 - **Brand Lead:** [seu nome] — marca, visual-rules, exceptions
 - **Copy Lead:** [seu nome] — tone, copy templates
-- **Content Operations:** [seu nome] — estrutura, workflows
+- **Content Operations:** [seu nome] — estrutura, workflows, Notion infra
 
 Para reportar um bug ou inconsistência no engine, abra um issue em `/GITHUB/issues` com tag `[sacopex-engine]`.
 
