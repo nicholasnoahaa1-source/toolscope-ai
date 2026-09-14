@@ -100,6 +100,30 @@
       transform: scale(0.98);
     }
 
+    button.secondary {
+      background: transparent;
+      color: var(--navy);
+      border: 1px solid var(--navy);
+      padding: 12px 20px;
+      font-size: 13px;
+    }
+
+    button.secondary:hover {
+      background: rgba(26, 43, 62, 0.05);
+    }
+
+    #insightsStatus {
+      background: rgba(232, 155, 126, 0.1);
+      border-left: 3px solid var(--laranja);
+      padding: 12px 16px;
+      border-radius: 2px;
+      color: var(--navy);
+    }
+
+    #insightsStatus.active {
+      display: block !important;
+    }
+
     .input-section > div:last-child {
       font-size: 13px;
       color: var(--navy-turtle);
@@ -250,10 +274,12 @@
       <div class="input-group">
         <input type="text" id="ideaInput" placeholder="Ex: Quero lançar SacoPex Oreo" />
         <button onclick="generateCascade()">Gerar Cascata</button>
+        <button class="secondary" onclick="loadAnalyticsInsights()" title="Carregar recomendações da Analytics Engine">💡 Carregar Insights</button>
       </div>
       <div style="font-size: 12px; color: var(--navy-turtle);">
         Escreva uma ideia simples. O engine extrai automaticamente produto, sabor e objetivo.
       </div>
+      <div id="insightsStatus" style="margin-top: 12px; font-size: 13px; display: none;"></div>
     </div>
 
     <div class="cascade-view" id="cascadeView">
@@ -554,9 +580,219 @@
       return new Promise(r => setTimeout(r, ms));
     }
 
+    // ============================================
+    // PHASE 2: ANALYTICS INTEGRATION
+    // ============================================
+    let analyticsInsights = null;
+
+    async function loadAnalyticsInsights() {
+      try {
+        const db = await new Promise((resolve, reject) => {
+          const req = indexedDB.open('sacopex-analytics');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+
+        const tx = db.transaction('metrics-collected', 'readonly');
+        const store = tx.objectStore('metrics-collected');
+        const metricsReq = store.getAll();
+
+        metricsReq.onsuccess = () => {
+          if (metricsReq.result.length > 0) {
+            const engine = new AnalyticsEngine(db);
+            Promise.all([
+              engine.getHookPerformance(),
+              engine.getFormatPerformance(),
+              engine.getConversionDrivers(),
+              engine.getGenerationRecommendations()
+            ]).then(([hooks, formats, drivers, recommendations]) => {
+              analyticsInsights = { hooks, formats, drivers, recommendations };
+              document.getElementById('insightsStatus').innerHTML =
+                `✓ Insights carregados: Top Hook=${hooks[0]?.hookType || 'N/A'}, Top Format=${formats[0]?.format || 'N/A'}`;
+              document.getElementById('insightsStatus').classList.add('active');
+            });
+          } else {
+            alert('Nenhuma métrica encontrada. Gere e publique conteúdo primeiro.');
+          }
+        };
+      } catch (e) {
+        alert('Erro ao carregar insights: ' + e.message);
+      }
+    }
+
+    function generateHooksWithInsights(bigIdea, objData, count) {
+      if (!analyticsInsights?.hooks || analyticsInsights.hooks.length === 0) {
+        return generateHooks(bigIdea, objData, count);
+      }
+
+      const topHook = analyticsInsights.hooks[0];
+      const hookTemplates = {
+        'curiosidade': [`${bigIdea}: você não vai acreditar`,
+                        `Espera só: ${bigIdea}`,
+                        `Verdade ou mito? ${bigIdea}`],
+        'humor': [`${bigIdea} — sim, de verdade!`,
+                  `Quando ${objData.emoções[0]} vira comédia`,
+                  `A risada que você não esperava`],
+        'shock': [`⚠️ ${bigIdea}`,
+                  `VERDADE: ${bigIdea}`,
+                  `Você não sabia disso sobre qualidade`],
+        'benefício': [`Como ${bigIdea} muda sua vida`,
+                      `O benefício secreto: ${bigIdea}`,
+                      `Seus amigos não querem que você saiba`],
+        'unboxing': [`Abrindo ${bigIdea}`,
+                     `First Look: ${bigIdea}`,
+                     `O que tem dentro é incrível`],
+        'tutorial': [`Aprenda: ${bigIdea}`,
+                     `Passo a passo para ${bigIdea}`,
+                     `Como dominar ${bigIdea}`],
+        'trending': [`#TrendingAgora: ${bigIdea}`,
+                     `Todos estão falando sobre: ${bigIdea}`,
+                     `O que está bombando: ${bigIdea}`]
+      };
+
+      const templates = hookTemplates[topHook.hookType] || hookTemplates['genérico'] ||
+        [`${bigIdea}`, `Aquele momento em que ${objData.emoções[0]} é sofisticada`, `Você merecia isso: ${bigIdea.toLowerCase()}`];
+
+      return templates.slice(0, count);
+    }
+
+    function generateReelsWithInsights(hooks, prodData, count) {
+      if (!analyticsInsights?.formats || analyticsInsights.formats.length === 0) {
+        return generateReels(hooks, prodData, count);
+      }
+
+      const topFormat = analyticsInsights.formats[0];
+      if (topFormat.format !== 'reel') {
+        return generateReels(hooks, prodData, count);
+      }
+
+      return hooks.slice(0, count).map((hook, i) => {
+        const scenes = [
+          '1️⃣ Hook: "' + hook + '"',
+          '2️⃣ Problema: Qualidade que você procura',
+          '3️⃣ Solução: ' + prodData.sabor,
+          '4️⃣ Prova: Veja a diferença',
+          '5️⃣ CTA: 2 por R$10 — pede agora'
+        ];
+        return `REEL ${i + 1}\n${scenes.join('\n')}\nDuração: 15-22s`;
+      });
+    }
+
+    function generateStoriesWithInsights(bigIdea, prodData, count) {
+      if (!analyticsInsights?.formats || analyticsInsights.formats.length === 0) {
+        return generateStories(bigIdea, prodData, count);
+      }
+
+      const topFormat = analyticsInsights.formats[0];
+      if (topFormat.format !== 'story') {
+        return generateStories(bigIdea, prodData, count);
+      }
+
+      return Array(count).fill(0).map((_, i) =>
+        `STORY ${i + 1}\n[Frame 1] ${bigIdea}\n[Frame 2] Problema: Qualidade é cara?\n[Frame 3] NÃO AQUI: ${prodData.sabor}\n[Frame 4] TOQUE AQUI: Saiba mais`
+      );
+    }
+
+    const originalGenerateCascade = generateCascade;
+    async function generateCascade() {
+      if (!analyticsInsights) {
+        return originalGenerateCascade();
+      }
+
+      const ideaInput = document.getElementById('ideaInput');
+      if (!ideaInput.value.trim()) {
+        showError('Escreva uma ideia para a cascata');
+        return;
+      }
+
+      document.getElementById('loading').classList.add('active');
+      document.getElementById('outputSection').innerHTML = '';
+      document.getElementById('error').classList.remove('active');
+
+      try {
+        const prodData = PRODUTOS_DB[ideaInput.value.split(',')[0].trim()] || PRODUTOS_DB.PADRÃO;
+        const objData = OBJETIVOS_MAP['geral'] || OBJETIVOS_MAP.VENDER;
+        const cascadeState = {
+          bigIdea: '',
+          hooks: [],
+          reels: [],
+          stories: [],
+          carousel: '',
+          post: '',
+          legendas: [],
+          ads: [],
+          abVariations: []
+        };
+
+        updateCascadeDiagram(0);
+        await delay(600);
+        cascadeState.bigIdea = generateBigIdea(prodData, objData);
+        addOutput('big-idea', `BIG IDEA\n\n${cascadeState.bigIdea}`, 0);
+
+        updateCascadeDiagram(1);
+        await delay(600);
+        cascadeState.hooks = generateHooksWithInsights(cascadeState.bigIdea, objData, 3);
+        cascadeState.hooks.forEach((h, i) => {
+          addOutput(`hook-${i}`, `HOOK ${i + 1}\n\n${h}`, i + 1);
+        });
+
+        updateCascadeDiagram(2);
+        await delay(600);
+        cascadeState.reels = generateReelsWithInsights(cascadeState.hooks, prodData, 2);
+        cascadeState.reels.forEach((r, i) => {
+          addOutput(`reel-${i}`, `REEL ${i + 1}\n\n${r}`, 4 + i);
+        });
+
+        updateCascadeDiagram(3);
+        await delay(600);
+        cascadeState.stories = generateStoriesWithInsights(cascadeState.bigIdea, prodData, 3);
+        cascadeState.stories.forEach((s, i) => {
+          addOutput(`story-${i}`, `STORY ${i + 1}\n\n${s}`, 6 + i);
+        });
+
+        updateCascadeDiagram(4);
+        await delay(600);
+        cascadeState.carousel = generateCarousel(cascadeState.bigIdea, cascadeState.hooks);
+        addOutput('carousel', `CARROSSEL (5 SLIDES)\n\n${cascadeState.carousel}`, 9);
+
+        updateCascadeDiagram(5);
+        await delay(600);
+        cascadeState.post = generatePost(cascadeState.bigIdea, prodData);
+        addOutput('post', `POST FEED\n\n${cascadeState.post}`, 10);
+
+        updateCascadeDiagram(6);
+        await delay(600);
+        cascadeState.legendas = generateLegendas(cascadeState.bigIdea, 3);
+        cascadeState.legendas.forEach((l, i) => {
+          addOutput(`legenda-${i}`, `LEGENDA ${i + 1}\n\n${l}`, 11 + i);
+        });
+
+        updateCascadeDiagram(7);
+        await delay(600);
+        cascadeState.ads = generateAds(cascadeState.hooks, 2);
+        cascadeState.ads.forEach((a, i) => {
+          addOutput(`ad-${i}`, `ANÚNCIO ${i + 1}\n\n${a}`, 14 + i);
+        });
+
+        updateCascadeDiagram(8);
+        await delay(600);
+        cascadeState.abVariations = generateABVariations(cascadeState.bigIdea, 3);
+        cascadeState.abVariations.forEach((v, i) => {
+          addOutput(`ab-${i}`, `VARIAÇÃO A/B ${i + 1}\n\n${v}`, 16 + i);
+        });
+
+        document.getElementById('loading').classList.remove('active');
+      } catch (e) {
+        showError('Erro ao gerar cascata: ' + e.message);
+        document.getElementById('loading').classList.remove('active');
+      }
+    }
+
     document.getElementById('ideaInput').addEventListener('keypress', e => {
       if (e.key === 'Enter') generateCascade();
     });
   </script>
+
+  <script src="analytics-engine.js"></script>
 </body>
 </html>
