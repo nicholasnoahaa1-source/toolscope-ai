@@ -1,0 +1,544 @@
+{
+  "generatedAt": "2026-09-14T04:15:00-03:00",
+  "owner": {
+    "name": "Você",
+    "email": "voce@exemplo.com",
+    "timeZone": "America/Sao_Paulo"
+  },
+  "connectors": [
+    {
+      "id": "google-calendar",
+      "name": "Google Calendar",
+      "area": "Rotina",
+      "status": "connected",
+      "feeds": "Agenda do dia e blocos de rotina"
+    },
+    {
+      "id": "gmail",
+      "name": "Gmail",
+      "area": "Comunicação",
+      "status": "connected",
+      "feeds": "Threads não lidas da caixa de entrada"
+    },
+    {
+      "id": "todoist",
+      "name": "Todoist",
+      "area": "Tarefas",
+      "status": "connected",
+      "feeds": "Projetos e tarefas com prazo"
+    },
+    {
+      "id": "notion",
+      "name": "Notion",
+      "area": "Notas",
+      "status": "connected",
+      "feeds": "Páginas abertas recentemente"
+    },
+    {
+      "id": "google-drive",
+      "name": "Google Drive",
+      "area": "Arquivos",
+      "status": "connected",
+      "feeds": "Arquivos modificados recentemente"
+    },
+    {
+      "id": "spotify",
+      "name": "Spotify",
+      "area": "Foco",
+      "status": "connected",
+      "feeds": "Trilha de estudo e treino"
+    },
+    {
+      "id": "slack",
+      "name": "Slack",
+      "area": "Comunicação",
+      "status": "connected",
+      "feeds": "Canais e menções"
+    },
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "area": "Projetos",
+      "status": "connected",
+      "feeds": "Deploys dos seus sites"
+    },
+    {
+      "id": "github",
+      "name": "GitHub",
+      "area": "Projetos",
+      "status": "connected",
+      "feeds": "Pull requests abertos dos seus projetos"
+    },
+    {
+      "id": "supabase",
+      "name": "Supabase",
+      "area": "Projetos",
+      "status": "connected",
+      "feeds": "Bancos dos seus projetos"
+    }
+  ],
+  "agenda": [
+    {
+      "id": "acordar",
+      "title": "Acordar e se arrumar",
+      "start": "2026-09-14T05:30:00-03:00",
+      "end": "2026-09-14T06:20:00-03:00",
+      "description": "Acordar, se arrumar e organizar as coisas antes de sair para a escola."
+    },
+    {
+      "id": "desloc-escola",
+      "title": "Deslocamento — Casa para Escola",
+      "start": "2026-09-14T06:20:00-03:00",
+      "end": "2026-09-14T07:10:00-03:00",
+      "description": "Trajeto de casa para a escola. Duração: 50 minutos."
+    },
+    {
+      "id": "escola",
+      "title": "Escola",
+      "start": "2026-09-14T07:15:00-03:00",
+      "end": "2026-09-14T12:45:00-03:00",
+      "description": "Período letivo."
+    },
+    {
+      "id": "desloc-casa",
+      "title": "Deslocamento — Escola para Casa",
+      "start": "2026-09-14T12:45:00-03:00",
+      "end": "2026-09-14T13:30:00-03:00",
+      "description": "Retorno da escola para casa. Duração: 45 minutos."
+    },
+    {
+      "id": "almoco",
+      "title": "Almoço",
+      "start": "2026-09-14T13:50:00-03:00",
+      "end": "2026-09-14T14:20:00-03:00",
+      "description": "Almoço."
+    },
+    {
+      "id": "desloc-basquete",
+      "title": "Deslocamento — Casa para Basquete",
+      "start": "2026-09-14T15:00:00-03:00",
+      "end": "2026-09-14T16:40:00-03:00",
+      "description": "Saída de casa para o treino de basquete. Duração: 1h40."
+    },
+    {
+      "id": "basquete",
+      "title": "Treino de Basquete",
+      "start": "2026-09-14T16:40:00-03:00",
+      "end": "2026-09-14T18:40:00-03:00",
+      "description": "Treino de basquete em quadra."
+    },
+    {
+      "id": "volta-basquete",
+      "title": "Deslocamento — Basquete para Casa",
+      "start": "2026-09-14T18:40:00-03:00",
+      "end": "2026-09-14T20:50:00-03:00",
+      "description": "Retorno do basquete para casa."
+    },
+    {
+      "id": "academia",
+      "title": "Academia",
+      "start": "2026-09-14T21:40:00-03:00",
+      "end": "2026-09-14T23:00:00-03:00",
+      "description": "Treino na academia. Saída de casa ~21:30. De segunda a sexta."
+    },
+    {
+      "id": "dormir",
+      "title": "Dormir",
+      "start": "2026-09-14T22:30:00-03:00",
+      "end": "2026-09-15T05:30:00-03:00",
+      "description": "Noites de domingo a quinta, acordando às 5:30 para a escola."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "ex1",
+      "title": "Entregar trabalho de biologia",
+      "project": "Escola",
+      "due": "2026-09-15T20:00:00-03:00",
+      "priority": 1
+    },
+    {
+      "id": "ex2",
+      "title": "Revisar plano de treino",
+      "project": "Saúde",
+      "due": "2026-09-16",
+      "priority": 3
+    },
+    {
+      "id": "ex3",
+      "title": "Organizar pasta de projetos no Drive",
+      "project": "Pessoal",
+      "priority": 4
+    }
+  ],
+  "inbox": [
+    {
+      "id": "ex1",
+      "subject": "Confirmação de matrícula",
+      "sender": "secretaria@escola.exemplo.br",
+      "snippet": "Sua matrícula para o próximo semestre foi confirmada.",
+      "date": "2026-09-14T03:39:23-03:00",
+      "unread": true
+    },
+    {
+      "id": "ex2",
+      "subject": "Resumo semanal do projeto",
+      "sender": "equipe@exemplo.com",
+      "snippet": "Três itens fecharam esta semana e dois seguem abertos.",
+      "date": "2026-09-13T19:54:06-03:00",
+      "unread": true
+    },
+    {
+      "id": "ex3",
+      "subject": "Recibo do plano mensal",
+      "sender": "faturamento@exemplo.com",
+      "snippet": "Pagamento processado com sucesso.",
+      "date": "2026-09-13T10:02:00-03:00",
+      "unread": false
+    }
+  ],
+  "notes": [
+    {
+      "id": "ex1",
+      "title": "Planejamento semanal",
+      "url": "https://www.notion.so/",
+      "icon": "🗓️"
+    },
+    {
+      "id": "ex2",
+      "title": "Metas do trimestre",
+      "url": "https://www.notion.so/",
+      "icon": "🎯"
+    }
+  ],
+  "files": [
+    {
+      "id": "ex1",
+      "title": "Cronograma de estudos.xlsx",
+      "url": "https://drive.google.com/",
+      "modifiedAt": "2026-09-12T18:20:00-03:00",
+      "kind": "Planilha"
+    },
+    {
+      "id": "ex2",
+      "title": "Projeto pessoal — notas.ipynb",
+      "url": "https://drive.google.com/",
+      "modifiedAt": "2026-09-10T09:05:00-03:00",
+      "kind": "Colab"
+    }
+  ],
+  "week": [
+    {
+      "id": "w0-Escola",
+      "title": "Escola",
+      "start": "2026-09-14T10:15:00.000Z",
+      "end": "2026-09-14T15:45:00.000Z"
+    },
+    {
+      "id": "w0-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-14T16:50:00.000Z",
+      "end": "2026-09-14T17:20:00.000Z"
+    },
+    {
+      "id": "w0-Academia",
+      "title": "Academia",
+      "start": "2026-09-15T00:40:00.000Z",
+      "end": "2026-09-15T02:00:00.000Z"
+    },
+    {
+      "id": "w0-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-15T01:30:00.000Z",
+      "end": "2026-09-15T08:30:00.000Z"
+    },
+    {
+      "id": "w1-Escola",
+      "title": "Escola",
+      "start": "2026-09-15T10:15:00.000Z",
+      "end": "2026-09-15T15:45:00.000Z"
+    },
+    {
+      "id": "w1-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-15T16:50:00.000Z",
+      "end": "2026-09-15T17:20:00.000Z"
+    },
+    {
+      "id": "w1-Academia",
+      "title": "Academia",
+      "start": "2026-09-16T00:40:00.000Z",
+      "end": "2026-09-16T02:00:00.000Z"
+    },
+    {
+      "id": "w1-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-16T01:30:00.000Z",
+      "end": "2026-09-16T08:30:00.000Z"
+    },
+    {
+      "id": "w2-Escola",
+      "title": "Escola",
+      "start": "2026-09-16T10:15:00.000Z",
+      "end": "2026-09-16T15:45:00.000Z"
+    },
+    {
+      "id": "w2-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-16T16:50:00.000Z",
+      "end": "2026-09-16T17:20:00.000Z"
+    },
+    {
+      "id": "w2-Academia",
+      "title": "Academia",
+      "start": "2026-09-17T00:40:00.000Z",
+      "end": "2026-09-17T02:00:00.000Z"
+    },
+    {
+      "id": "w2-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-17T01:30:00.000Z",
+      "end": "2026-09-17T08:30:00.000Z"
+    },
+    {
+      "id": "w3-Escola",
+      "title": "Escola",
+      "start": "2026-09-17T10:15:00.000Z",
+      "end": "2026-09-17T15:45:00.000Z"
+    },
+    {
+      "id": "w3-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-17T16:50:00.000Z",
+      "end": "2026-09-17T17:20:00.000Z"
+    },
+    {
+      "id": "w3-Academia",
+      "title": "Academia",
+      "start": "2026-09-18T00:40:00.000Z",
+      "end": "2026-09-18T02:00:00.000Z"
+    },
+    {
+      "id": "w3-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-18T01:30:00.000Z",
+      "end": "2026-09-18T08:30:00.000Z"
+    },
+    {
+      "id": "w4-Escola",
+      "title": "Escola",
+      "start": "2026-09-18T10:15:00.000Z",
+      "end": "2026-09-18T15:45:00.000Z"
+    },
+    {
+      "id": "w4-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-18T16:50:00.000Z",
+      "end": "2026-09-18T17:20:00.000Z"
+    },
+    {
+      "id": "w4-Academia",
+      "title": "Academia",
+      "start": "2026-09-19T00:40:00.000Z",
+      "end": "2026-09-19T02:00:00.000Z"
+    },
+    {
+      "id": "w4-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-19T01:30:00.000Z",
+      "end": "2026-09-19T08:30:00.000Z"
+    },
+    {
+      "id": "w5-Escola",
+      "title": "Escola",
+      "start": "2026-09-19T10:15:00.000Z",
+      "end": "2026-09-19T15:45:00.000Z"
+    },
+    {
+      "id": "w5-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-19T16:50:00.000Z",
+      "end": "2026-09-19T17:20:00.000Z"
+    },
+    {
+      "id": "w5-Academia",
+      "title": "Academia",
+      "start": "2026-09-20T00:40:00.000Z",
+      "end": "2026-09-20T02:00:00.000Z"
+    },
+    {
+      "id": "w5-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-20T01:30:00.000Z",
+      "end": "2026-09-20T08:30:00.000Z"
+    },
+    {
+      "id": "w6-Escola",
+      "title": "Escola",
+      "start": "2026-09-20T10:15:00.000Z",
+      "end": "2026-09-20T15:45:00.000Z"
+    },
+    {
+      "id": "w6-Almoço",
+      "title": "Almoço",
+      "start": "2026-09-20T16:50:00.000Z",
+      "end": "2026-09-20T17:20:00.000Z"
+    },
+    {
+      "id": "w6-Academia",
+      "title": "Academia",
+      "start": "2026-09-21T00:40:00.000Z",
+      "end": "2026-09-21T02:00:00.000Z"
+    },
+    {
+      "id": "w6-Dormir",
+      "title": "Dormir",
+      "start": "2026-09-21T01:30:00.000Z",
+      "end": "2026-09-21T08:30:00.000Z"
+    }
+  ],
+  "history": [
+    {
+      "title": "Escola",
+      "start": "2026-08-31T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-01T00:40:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-08-31T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-01T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-02T00:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-02T10:15:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-09-02T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-03T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-04T00:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-04T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-05T00:40:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-09-04T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-05T10:15:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-06T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-07T00:40:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-09-06T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-07T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-08T00:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-08T10:15:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-09-08T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-09T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-10T00:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-10T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-11T00:40:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-09-10T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-11T10:15:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-12T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-13T00:40:00.000Z"
+    },
+    {
+      "title": "Treino de Basquete",
+      "start": "2026-09-12T19:40:00.000Z"
+    },
+    {
+      "title": "Escola",
+      "start": "2026-09-13T10:15:00.000Z"
+    },
+    {
+      "title": "Academia",
+      "start": "2026-09-14T00:40:00.000Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "ex1",
+      "title": "Site pessoal: nova página inicial",
+      "repo": "exemplo",
+      "status": "draft",
+      "url": "https://github.com/",
+      "updatedAt": "2026-09-13T10:00:00-03:00"
+    },
+    {
+      "id": "ex2",
+      "title": "Corrigir importação da planilha de notas",
+      "repo": "exemplo",
+      "status": "open",
+      "url": "https://github.com/",
+      "updatedAt": "2026-09-11T15:30:00-03:00"
+    }
+  ]
+}

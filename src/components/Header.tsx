@@ -2,7 +2,9 @@ import Link from "next/link";
 import { getCategories } from "@/lib/data";
 
 export default async function Header() {
-  const categories = await getCategories();
+  // O Painel da Vida não depende do banco do catálogo; um Postgres indisponível
+  // deixa a navegação sem categorias, mas não derruba a página inteira.
+  const categories = await getCategories().catch(() => []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur">
@@ -23,6 +25,12 @@ export default async function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/painel"
+            className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-brand hover:text-brand"
+          >
+            Painel
+          </Link>
           <Link
             href="/compare"
             className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-brand hover:text-brand"

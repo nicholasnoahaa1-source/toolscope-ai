@@ -34,3 +34,45 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Painel da Vida (`/painel`)
+
+Uma página que reúne a sua rotina em um lugar só:
+
+- **Hoje / Próximos 7 dias** — a agenda do dia com o bloco atual destacado, ou a
+  semana inteira com a carga de cada dia (`?v=semana`).
+- **Onde vai o seu dia** — quantas horas vão para escola, treino, deslocamento,
+  sono e refeições, calculadas a partir dos blocos da agenda.
+- **Hábitos** — sequência dos últimos 14 dias de academia, basquete e escola,
+  derivada do histórico da agenda.
+- **Tarefas, caixa de entrada, notas e arquivos** — Todoist, Gmail, Notion e Drive.
+- **Projetos** — pull requests abertos no GitHub.
+- **Ações rápidas** e o estado de cada conector.
+
+As métricas ficam em `src/lib/life/metrics.ts` e são todas derivadas: um snapshot
+novo atualiza os números sozinho, sem nada calculado à mão no JSON.
+
+### Como os dados chegam aqui
+
+Os conectores (Google Calendar, Gmail, Todoist, Notion, Google Drive, Spotify,
+Slack, Vercel, GitHub, Supabase) são autenticados **dentro do Claude**, não
+neste site — o site não tem os tokens de OAuth deles e não consegue chamá-los
+sozinho. Então o painel lê um **snapshot**: um JSON com o estado atual da sua
+vida, que o assistente regrava a pedido ("atualiza meu painel").
+
+A ordem de resolução está em `src/lib/life/snapshot.ts`:
+
+1. `LIFE_SNAPSHOT_JSON` — o JSON inteiro numa variável de ambiente (use em deploy).
+2. `data/life-snapshot.local.json` — o seu snapshot real, **fora do git**.
+3. `data/life-snapshot.example.json` — exemplo público, para o painel nunca ficar vazio.
+
+O formato está tipado em `src/lib/life/types.ts`. Se um dia você quiser dados ao
+vivo sem passar pelo assistente, é aqui que entra: troque `getLifeSnapshot()` por
+chamadas às APIs de cada serviço com OAuth próprio, mantendo o mesmo formato — o
+resto da página não muda.
+
+### Por que o snapshot real não está no repositório
+
+Ele contém assunto de e-mail, remetente, compromissos e nomes de arquivos seus.
+`data/life-snapshot.local.json` está no `.gitignore`; só o exemplo, com dados
+fictícios, é versionado.
