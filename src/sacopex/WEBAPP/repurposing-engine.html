@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SacoPex Content Repurposing Engine</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --creme: #F5F1EB;
+      --navy: #1A2B3E;
+      --navy-turtle: #2D4A5C;
+      --laranja: #E89B7E;
+      --border: #ddd;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--creme);
+      color: var(--navy);
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--navy-turtle);
+    }
+
+    .input-section {
+      background: white;
+      border: 2px solid var(--navy);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 48px;
+    }
+
+    .input-group {
+      margin-bottom: 24px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--navy);
+    }
+
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26, 43, 62, 0.1);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--navy);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s;
+      flex: 1;
+    }
+
+    button:hover {
+      background: var(--navy-turtle);
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--navy);
+      color: var(--navy);
+    }
+
+    button.secondary:hover {
+      background: var(--creme);
+    }
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .platform-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .platform-checkbox:hover {
+      background: var(--creme);
+      border-color: var(--navy);
+    }
+
+    .platform-checkbox input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    .platform-checkbox input[type="checkbox"]:checked + label {
+      font-weight: 600;
+    }
+
+    .platform-checkbox label {
+      cursor: pointer;
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .repurpose-view {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .repurpose-view.active {
+      display: grid;
+    }
+
+    .diagram-panel {
+      background: white;
+      border: 2px solid var(--navy);
+      border-radius: 8px;
+      padding: 32px;
+      font-family: monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      color: var(--navy);
+      max-height: 700px;
+      overflow-y: auto;
+    }
+
+    .outputs-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .output-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: none;
+    }
+
+    .output-card.active {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .output-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--navy);
+      border-bottom: 2px solid var(--laranja);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .platform-badge {
+      display: inline-block;
+      background: var(--laranja);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: sans-serif;
+    }
+
+    .output-card .content {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--navy-turtle);
+      max-height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .specs {
+      font-size: 11px;
+      color: #999;
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--laranja);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #ffe0e0;
+      border: 1px solid #ff9999;
+      color: #c00;
+      padding: 16px;
+      border-radius: 6px;
+      display: none;
+      margin-bottom: 24px;
+    }
+
+    .error.active {
+      display: block;
+    }
+
+    @media (max-width: 1024px) {
+      .repurpose-view.active {
+        grid-template-columns: 1fr;
+      }
+
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .platforms-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📦 SacoPex Content Repurposing Engine</h1>
+      <p>Uma peça de conteúdo → Adaptações para todas as plataformas</p>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="input-section">
+      <div class="input-group">
+        <label>Cole o conteúdo que quer reutilizar (Reel, Post, Hook, etc)</label>
+        <textarea id="contentInput" placeholder="Cole aqui um Reel, Post, Hook, Legenda ou qualquer conteúdo SacoPex..."></textarea>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label>Tipo de conteúdo</label>
+          <select id="contentType">
+            <option value="auto">Detectar automaticamente</option>
+            <option value="reel">Reel</option>
+            <option value="post">Post</option>
+            <option value="hook">Hook</option>
+            <option value="story">Story</option>
+            <option value="carousel">Carrossel</option>
+            <option value="legenda">Legenda</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Produto</label>
+          <select id="productSelect">
+            <option value="Oreo">SacoPex Oreo</option>
+            <option value="Morango">SacoPex Morango</option>
+            <option value="Chocolate">SacoPex Chocolate</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Objetivo</label>
+          <select id="objectiveSelect">
+            <option value="venda">Venda</option>
+            <option value="engajamento">Engajamento</option>
+            <option value="lançamento">Lançamento</option>
+            <option value="awareness">Awareness</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Selecione as plataformas para adaptar</label>
+        <div class="platforms-grid">
+          <label class="platform-checkbox">
+            <input type="checkbox" name="platform" value="instagram" checked>
+            <label>📱 Instagram</label>
+          </label>
+          <label class="platform-checkbox">
+            <input type="checkbox" name="platform" value="tiktok" checked>
+            <label>🎵 TikTok</label>
+          </label>
+          <label class="platform-checkbox">
+            <input type="checkbox" name="platform" value="whatsapp" checked>
+            <label>💬 WhatsApp</label>
+          </label>
+          <label class="platform-checkbox">
+            <input type="checkbox" name="platform" value="youtube" checked>
+            <label>▶️ YouTube Shorts</label>
+          </label>
+          <label class="platform-checkbox">
+            <input type="checkbox" name="platform" value="ads" checked>
+            <label>📢 Anúncios</label>
+          </label>
+          <label class="platform-checkbox">
+            <input type="checkbox" name="platform" value="email">
+            <label>📧 Email</label>
+          </label>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button onclick="repurpose()">Reutilizar para Plataformas</button>
+        <button class="secondary" onclick="resetForm()">Limpar</button>
+      </div>
+    </div>
+
+    <div class="repurpose-view" id="repurposeView">
+      <div class="diagram-panel" id="diagramPanel"></div>
+      <div class="outputs-panel" id="outputsPanel"></div>
+    </div>
+
+    <div class="loading" id="loading">
+      <span class="spinner"></span> Adaptando para plataformas...
+    </div>
+  </div>
+
+  <script>
+    const PLATFORM_SPECS = {
+      instagram: {
+        formats: ['Reel', 'Post', 'Stories', 'Carrossel'],
+        reel: { duration: '15-90s', aspect: '9:16', maxText: '100 chars' },
+        post: { aspect: '1:1 ou 4:5', maxText: '2200 chars', elements: 'Foto + Legenda' },
+        stories: { duration: '5-15s', aspect: '9:16', cards: '3-5', maxText: '80 chars' },
+        carousel: { slides: '3-10', aspect: '1:1', maxText: '100 chars/slide' }
+      },
+      tiktok: {
+        formats: ['Video', 'Caption'],
+        video: { duration: '15-60s', aspect: '9:16', trend_aware: true },
+        caption: { maxChars: 2200, hashtags: '3-5' }
+      },
+      whatsapp: {
+        formats: ['Mensagem', 'Catálogo'],
+        mensagem: { maxChars: 1000, emoji_ok: true, links: 'encurtado' },
+        catalog: { format: 'Link compartilhável' }
+      },
+      youtube: {
+        formats: ['Shorts'],
+        shorts: { duration: '15-60s', aspect: '9:16', maxTitle: '100 chars' }
+      },
+      ads: {
+        formats: ['Ad Copy A/B', 'Headlines'],
+        copy: { variants: '2', maxBody: '125 chars' },
+        headline: { variants: '3', maxChars: '30 chars' }
+      },
+      email: {
+        formats: ['Campaign', 'Newsletter'],
+        campaign: { maxSubject: '50 chars', preheader: '100 chars' }
+      }
+    };
+
+    function getSelectedPlatforms() {
+      return Array.from(document.querySelectorAll('input[name="platform"]:checked'))
+        .map(el => el.value);
+    }
+
+    function repurpose() {
+      const content = document.getElementById('contentInput').value.trim();
+      const contentType = document.getElementById('contentType').value;
+      const product = document.getElementById('productSelect').value;
+      const objective = document.getElementById('objectiveSelect').value;
+      const platforms = getSelectedPlatforms();
+
+      if (!content) {
+        showError('Cole um conteúdo para começar');
+        return;
+      }
+
+      if (platforms.length === 0) {
+        showError('Selecione pelo menos uma plataforma');
+        return;
+      }
+
+      document.getElementById('repurposeView').classList.add('active');
+      document.getElementById('loading').classList.add('active');
+      document.getElementById('outputsPanel').innerHTML = '';
+
+      setTimeout(async () => {
+        try {
+          const detectedType = contentType === 'auto' ? detectContentType(content) : contentType;
+
+          // Draw diagram
+          drawDiagram(detectedType, platforms);
+
+          // Generate for each platform
+          for (let i = 0; i < platforms.length; i++) {
+            const platform = platforms[i];
+            const adaptations = generateAdaptations(content, detectedType, platform, product, objective);
+
+            adaptations.forEach((adaptation, idx) => {
+              await delay(300);
+              addOutput(
+                `${platform}-${idx}`,
+                adaptation.title,
+                adaptation.content,
+                adaptation.specs,
+                platform,
+                i * 10 + idx
+              );
+            });
+          }
+
+          document.getElementById('loading').classList.remove('active');
+        } catch (e) {
+          showError('Erro: ' + e.message);
+          document.getElementById('loading').classList.remove('active');
+        }
+      }, 100);
+    }
+
+    function detectContentType(text) {
+      const lower = text.toLowerCase();
+      if (lower.includes('reel') || lower.includes('vídeo') || lower.includes('15s')) return 'reel';
+      if (lower.includes('post') || lower.includes('feed')) return 'post';
+      if (lower.includes('hook')) return 'hook';
+      if (lower.includes('story') || lower.includes('3-5')) return 'story';
+      if (lower.includes('carrossel') || lower.includes('slide')) return 'carousel';
+      return 'legenda';
+    }
+
+    function drawDiagram(contentType, platforms) {
+      let diagram = `INPUT: ${contentType.toUpperCase()}\n`;
+      diagram += '       ↓\n[CONTENT ANALYZER]\n       ↓\n\n';
+
+      platforms.forEach((p, i) => {
+        const specs = PLATFORM_SPECS[p];
+        const formats = specs.formats.join(' + ');
+        diagram += `[${p.toUpperCase()} ADAPTER] → ${formats}\n`;
+        if (i < platforms.length - 1) diagram += '       ↓\n';
+      });
+
+      diagram += '\n\nOUTPUT: Conteúdo adaptado para cada plataforma ✓';
+      document.getElementById('diagramPanel').innerHTML = diagram;
+    }
+
+    function generateAdaptations(content, type, platform, product, objective) {
+      const adaptations = [];
+
+      if (platform === 'instagram') {
+        adaptations.push({
+          title: 'Instagram Reel',
+          content: `Hook nos primeiros 3 segundos:\n"${content.split('\n')[0]}"\n\nDuração: 15-22s\nAspecto: 9:16\n\nPaleta: Creme, Navy, Laranja\nTipografia: Manrope (bold)\n\nCena 1-2: Produto em foco\nCena 3: Ação/contexto\nÚltimo card: CTA + Assinatura`,
+          specs: 'Duration: 15-90s | Aspect: 9:16 | Format: Video'
+        });
+
+        adaptations.push({
+          title: 'Instagram Post',
+          content: `Legenda:\n"${content.split('\n')[0]}"\n\nImagem principal: produto em destaque\nFundo: Creme ou contexto lifestyle\n\nPaleta restrita às 4 cores da marca\nSem efeitos, sem cliparts\n\nHashtags:\n#SacoPex #${product} #MomentoSofisticado`,
+          specs: 'Aspect: 1:1 or 4:5 | Max Text: 2200 chars'
+        });
+
+        adaptations.push({
+          title: 'Instagram Stories',
+          content: `Story 1 (0-5s): Hook visual\n"${content.split('\n')[0]}"\n\nStory 2 (5-10s): Benefício\n"Qualidade, refrescância, sem compromisos"\n\nStory 3 (10-15s): CTA\n"Peça já — link na bio"`,
+          specs: 'Duration: 5-15s each | 3-5 cards | Aspect: 9:16'
+        });
+
+        adaptations.push({
+          title: 'Instagram Carrossel',
+          content: `Slide 1: Big Idea\nSlide 2: Hook emocional\nSlide 3: Benefício/detalhe\nSlide 4: Contexto de uso\nSlide 5: Oferta + CTA\n\nCada slide em 1:1\nTexto sobreposto em Manrope\nPaleta locked`,
+          specs: 'Slides: 3-10 | Aspect: 1:1 | Max 100 chars/slide'
+        });
+      }
+
+      else if (platform === 'tiktok') {
+        adaptations.push({
+          title: 'TikTok Video',
+          content: `Hook nos primeiros 1 segundo:\n"${content.split('\n')[0]}"\n\nDuração: 15-60s\nAspecto: 9:16\n\nTendência: transição rápida\nSom: instrumental ou trending audio\n\nTexto on-screen: Manrope bold\nSem efeitos excessivos\nMovimento natural`,
+          specs: 'Duration: 15-60s | Aspect: 9:16 | Trend-aware'
+        });
+      }
+
+      else if (platform === 'whatsapp') {
+        const shortCopy = content.split('\n')[0].substring(0, 100);
+        adaptations.push({
+          title: 'WhatsApp Venda',
+          content: `${shortCopy}...\n\n2 por R$10 🎉\n\nPeça já — link: [encurtado]\n\nSacoPex Oreo\nQualidade sofisticada 🍦`,
+          specs: 'Max: 1000 chars | Emojis: OK | Link: shortened'
+        });
+      }
+
+      else if (platform === 'youtube') {
+        adaptations.push({
+          title: 'YouTube Shorts',
+          content: `Título:\n"${content.split('\n')[0]}"\n\nDescrição:\nSacoPex ${product} — qualidade premium, preço acessível.\n2 por R$10\n\nPeça em seu supermercado favorito\n#SacoPex #${product}`,
+          specs: 'Duration: 15-60s | Aspect: 9:16 | Max Title: 100 chars'
+        });
+      }
+
+      else if (platform === 'ads') {
+        adaptations.push({
+          title: 'Anúncio — Copy A (Emocional)',
+          content: `Headline:\n"${content.split('\n')[0]}"\n\nBody:\nSacoPex ${product}: qualidade sofisticada, preço acessível. Peça agora — 2 por R$10.\n\nCTA: Compre Agora`,
+          specs: 'Headline: 30 chars | Body: 125 chars'
+        });
+
+        adaptations.push({
+          title: 'Anúncio — Copy B (Racional)',
+          content: `Headline:\n"2 por R$10 — Qualidade Premium"\n\nBody:\nSacoPex ${product}. Ingredientes selecionados, sabor autêntico, refrescância garantida.\n\nCTA: Saiba Mais`,
+          specs: 'Headline: 30 chars | Body: 125 chars'
+        });
+
+        adaptations.push({
+          title: 'Anúncio — Copy C (Urgência)',
+          content: `Headline:\n"Antes que Derreta — Peça Já"\n\nBody:\nPromoção limitada: 2 SacoPex ${product} por R$10. Estoque limitado.\n\nCTA: Não Perca`,
+          specs: 'Headline: 30 chars | Body: 125 chars'
+        });
+      }
+
+      else if (platform === 'email') {
+        adaptations.push({
+          title: 'Email Campaign',
+          content: `Subject: "Quando sofisticação é simples — SacoPex ${product}"\n\nPreheader: "Qualidade premium, preço acessível. 2 por R$10"\n\nBody:\n${content.split('\n')[0]}\n\nSacoPex: qualidade sem compromisos.\n2 por R$10 — Peça agora`,
+          specs: 'Subject: 50 chars | Preheader: 100 chars'
+        });
+      }
+
+      return adaptations;
+    }
+
+    function addOutput(id, title, content, specs, platform, index) {
+      const panel = document.getElementById('outputsPanel');
+      const card = document.createElement('div');
+      card.className = 'output-card';
+      card.id = `output-${id}`;
+      card.innerHTML = `
+        <h3>
+          ${title}
+          <span class="platform-badge">${platform.toUpperCase()}</span>
+        </h3>
+        <div class="content">${content}</div>
+        <div class="specs">${specs}</div>
+      `;
+      panel.appendChild(card);
+      setTimeout(() => card.classList.add('active'), 50);
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.classList.add('active');
+      setTimeout(() => el.classList.remove('active'), 5000);
+    }
+
+    function resetForm() {
+      document.getElementById('contentInput').value = '';
+      document.getElementById('contentType').value = 'auto';
+      document.getElementById('repurposeView').classList.remove('active');
+    }
+
+    function delay(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+
+    document.getElementById('contentInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.ctrlKey) repurpose();
+    });
+  </script>
+</body>
+</html>

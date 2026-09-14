@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SacoPex Content OS — Central de Geração</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --creme: #F5F1EB;
+      --navy: #1A2B3E;
+      --navy-turtle: #2D4A5C;
+      --laranja: #E89B7E;
+      --border: #ddd;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--creme) 0%, #faf7f2 100%);
+      color: var(--navy);
+      padding: 40px 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .header h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 16px;
+      color: var(--navy-turtle);
+      margin-bottom: 12px;
+    }
+
+    .header small {
+      font-size: 13px;
+      color: #999;
+      display: block;
+    }
+
+    .engines-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+
+    .engine-card {
+      background: white;
+      border: 2px solid var(--navy);
+      border-radius: 12px;
+      padding: 40px 32px;
+      text-align: center;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .engine-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(26, 43, 62, 0.15);
+    }
+
+    .engine-icon {
+      font-size: 56px;
+      line-height: 1;
+    }
+
+    .engine-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .engine-card p {
+      font-size: 14px;
+      color: var(--navy-turtle);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .engine-features {
+      text-align: left;
+      background: var(--creme);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 12px;
+      color: var(--navy-turtle);
+    }
+
+    .engine-features li {
+      list-style: none;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .engine-features li:before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--laranja);
+      font-weight: bold;
+    }
+
+    .engine-features li:last-child {
+      margin-bottom: 0;
+    }
+
+    .engine-card a {
+      display: inline-block;
+      padding: 14px 28px;
+      background: var(--navy);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .engine-card a:hover {
+      background: var(--navy-turtle);
+    }
+
+    .info-section {
+      background: white;
+      border: 2px solid var(--laranja);
+      border-radius: 8px;
+      padding: 32px;
+      margin-top: 48px;
+    }
+
+    .info-section h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--navy);
+    }
+
+    .info-section p {
+      font-size: 14px;
+      color: var(--navy-turtle);
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+
+    .info-section p:last-child {
+      margin-bottom: 0;
+    }
+
+    .brand-badge {
+      display: inline-block;
+      background: var(--laranja);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      margin: 0 2px;
+    }
+
+    .flow-diagram {
+      background: var(--creme);
+      border-radius: 8px;
+      padding: 24px;
+      margin-top: 24px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--navy);
+      text-align: center;
+      line-height: 2;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .engines-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .engine-card {
+        padding: 24px;
+      }
+
+      .engine-icon {
+        font-size: 40px;
+      }
+
+      .engine-card h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>SacoPex Content OS</h1>
+      <p>Sistema modular de geração de conteúdo</p>
+      <small>Cascata de ideias + Reutilização inteligente = 20+ peças por sessão</small>
+    </div>
+
+    <div class="engines-grid">
+      <!-- Cascade Engine Card -->
+      <div class="engine-card">
+        <div class="engine-icon">🚀</div>
+        <h2>Cascade Engine</h2>
+        <p>Transforme uma ideia em 20+ peças de conteúdo automaticamente</p>
+
+        <ul class="engine-features">
+          <li>Uma ideia → Big Idea + Hooks</li>
+          <li>Reels, Stories, Carrossel</li>
+          <li>Posts, Anúncios, A/B Variations</li>
+          <li>Cascata automática em 9 estágios</li>
+        </ul>
+
+        <a href="cascade-engine.html">Abrir Cascade Engine</a>
+      </div>
+
+      <!-- Repurposing Engine Card -->
+      <div class="engine-card">
+        <div class="engine-icon">📦</div>
+        <h2>Repurposing Engine</h2>
+        <p>Adapte qualquer conteúdo para todas as plataformas</p>
+
+        <ul class="engine-features">
+          <li>Cole: Reel, Post, Hook ou Legenda</li>
+          <li>Plataformas: Instagram, TikTok, WhatsApp</li>
+          <li>YouTube Shorts, Anúncios, Email</li>
+          <li>Adaptações automáticas com specs</li>
+        </ul>
+
+        <a href="repurposing-engine.html">Abrir Repurposing Engine</a>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h3>Como funciona o SacoPex Content OS</h3>
+
+      <p>
+        O Content OS foi projetado como um sistema integrado de dois motores complementares:
+      </p>
+
+      <div class="flow-diagram">
+        IDEIA SIMPLES<br/>
+        (ex: "Quero lançar SacoPex Oreo")<br/>
+        ↓<br/>
+        [CASCADE ENGINE]<br/>
+        ↓<br/>
+        20+ PEÇAS DE CONTEÚDO<br/>
+        ↓<br/>
+        [REPURPOSING ENGINE]<br/>
+        ↓<br/>
+        ADAPTAÇÕES EM TODAS AS PLATAFORMAS ✓
+      </div>
+
+      <p style="margin-top: 24px;">
+        <strong>Estágio 1 — Cascade Engine:</strong>
+        Insira uma ideia natural (ex: "Quero vender SacoPex Morango" ou "Lançamento de novo sabor").
+        O engine extrai automaticamente produto, sabor e objetivo, gerando uma cascata estruturada:
+        Big Idea → Hooks (3) → Reels (2) → Stories (3) → Carrossel → Post → Legendas (3) → Anúncios (2) → A/B Variations (3).
+      </p>
+
+      <p style="margin-top: 12px;">
+        <strong>Estágio 2 — Repurposing Engine:</strong>
+        Pegue qualquer peça gerada (ou conteúdo existente) e reutilize em múltiplas plataformas.
+        O engine detecta automaticamente o tipo de conteúdo e adapta com especificações exatas:
+        duração, aspect ratio, limite de caracteres, hashtags, emojis, CTAs — tudo conforme as regras de cada plataforma.
+      </p>
+
+      <p style="margin-top: 12px;">
+        <strong>Compliance Brand Automático:</strong>
+        Todos os outputs respeitam o <span class="brand-badge">BRAND_BRAIN</span> locked:
+        Paleta (Creme, Navy, Navy Tartaruga, Laranja Pastel), Tipografia (Manrope, Tiempos Text Italic),
+        Proibições (sem health claims, sem gírias forçadas, sem logos/símbolos).
+      </p>
+
+      <p style="margin-top: 12px;">
+        <strong>Entrada Flexível:</strong>
+        Cascade Engine aceita linguagem natural simples. Repurposing Engine auto-detecta tipo de conteúdo (reel, post, hook, story, carousel, legenda).
+      </p>
+    </div>
+  </div>
+</body>
+</html>

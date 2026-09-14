@@ -26,12 +26,60 @@ sacopex/
 │       ├── visual.template.md
 │       └── video.template.md
 │
+├── WEBAPP/                         # Webapp — dois engines integrados
+│   ├── index.html                 # Hub/Menu de navegação
+│   ├── cascade-engine.html        # Ideia → 20+ peças (9 estágios)
+│   ├── repurposing-engine.html    # Peça → Adaptações (6 plataformas)
+│   └── README.md                  # Documentação detalhada
+│
 └── OUTPUT/                        # Conteúdo gerado, organizado por plataforma
     ├── instagram/
     ├── tiktok/
     ├── ads/
     └── campaigns/
 ```
+
+---
+
+## SacoPex Content OS — Webapp (NEW!)
+
+**Sistema integrado de dois engines complementares para geração automática de conteúdo.**
+
+### Acesse em: `/WEBAPP/index.html`
+
+#### 🚀 **Cascade Engine** — Uma Ideia → 20+ Peças
+- **Input:** Texto natural (ex: "Quero lançar SacoPex Oreo")
+- **Processamento:** Auto-parsing + 9 geradores sequenciais
+- **Output:** Big Idea, Hooks (3), Reels (2), Stories (3), Carrossel, Post, Legendas (3), Anúncios (2), A/B Variations (3)
+- **Tempo:** ~2 minutos para 20+ peças completas
+- **Arquivo:** `WEBAPP/cascade-engine.html`
+
+#### 📦 **Repurposing Engine** — Uma Peça → Plataformas
+- **Input:** Qualquer conteúdo (Reel, Post, Hook, Story, Carousel, Legenda)
+- **Plataformas:** Instagram, TikTok, WhatsApp, YouTube Shorts, Anúncios, Email
+- **Output:** Adaptações específicas com specs exatas (duração, aspect ratio, chars, emojis, hashtags)
+- **Tempo:** ~1 minuto por plataforma
+- **Arquivo:** `WEBAPP/repurposing-engine.html`
+
+#### Fluxo Integrado Recomendado:
+```
+Cascade Engine (ideia) → 20+ peças
+         ↓
+Selecione 1 peça
+         ↓
+Repurposing Engine (cole peça) → Plataformas
+         ↓
+Output: 20+ peças × 6 plataformas = 100+ variações prontas
+```
+
+**Vantagens:**
+- ✅ Entrada natural (sem forms complexos)
+- ✅ Brand compliance automático (BRAND_BRAIN locked)
+- ✅ Client-side only (funciona offline)
+- ✅ Zero setup — abra e use
+- ✅ Extensível (adicione sabores, plataformas, restrições)
+
+**Leia a documentação completa:** `/WEBAPP/README.md`
 
 ---
 
@@ -292,10 +340,11 @@ Para reportar um bug ou inconsistência no engine, abra um issue em `/GITHUB/iss
 ## Histórico
 
 - **v1.0** (Jan 2024) — Engine lançado com Sacolé Oreo; 4 módulos core (Strategy, Creative, Copy, Visual); QC automático
-- **v1.1** (planned) — Integração DALL-E / Midjourney para geração de imagem automática
-- **v2.0** (planned) — Integração de vídeo (Runway, Synthesia); A/B testing automático
+- **v1.1** (Sep 2026) — Webapp integrada com dois engines: Cascade Engine (ideia → 20+ peças) + Repurposing Engine (peça → plataformas)
+- **v1.2** (planned) — Integração DALL-E / Midjourney para geração de imagem automática
+- **v2.0** (planned) — Integração de vídeo (Runway, Synthesia); A/B testing automático; Notion sync
 
 ---
 
 **SacoPex Content Engine — Sistema Modular de Geração de Conteúdo**  
-Última atualização: 2024-01-15
+Última atualização: 2026-09-14

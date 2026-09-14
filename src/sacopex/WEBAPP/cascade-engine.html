@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SacoPex Cascade Engine</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --creme: #F5F1EB;
+      --navy: #1A2B3E;
+      --navy-turtle: #2D4A5C;
+      --laranja: #E89B7E;
+      --border: #ddd;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--creme);
+      color: var(--navy);
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--navy-turtle);
+    }
+
+    .input-section {
+      background: white;
+      border: 2px solid var(--navy);
+      border-radius: 8px;
+      padding: 32px;
+      margin-bottom: 48px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(26, 43, 62, 0.1);
+    }
+
+    button {
+      padding: 14px 28px;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: var(--navy-turtle);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .cascade-view {
+      display: none;
+    }
+
+    .cascade-view.active {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    .cascade-diagram {
+      background: white;
+      border: 2px solid var(--navy);
+      border-radius: 8px;
+      padding: 32px;
+      font-size: 12px;
+      font-family: monospace;
+      line-height: 1.8;
+      color: var(--navy);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .cascade-diagram .complete { color: var(--laranja); font-weight: bold; }
+    .cascade-diagram .pending { opacity: 0.4; }
+    .cascade-diagram .arrow { color: var(--navy-turtle); }
+
+    .output-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .artifact-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: none;
+    }
+
+    .artifact-card.active {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .artifact-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--navy);
+      border-bottom: 2px solid var(--laranja);
+      padding-bottom: 8px;
+    }
+
+    .artifact-card .content {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--navy-turtle);
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 24px;
+      color: var(--navy-turtle);
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid var(--laranja);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 12px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error {
+      background: #ffe0e0;
+      border: 1px solid #ff9999;
+      color: #c00;
+      padding: 16px;
+      border-radius: 6px;
+      display: none;
+      margin-bottom: 24px;
+    }
+
+    .error.active {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .cascade-view.active {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 SacoPex Cascade Engine</h1>
+      <p>Uma ideia → 20+ peças de conteúdo automaticamente</p>
+    </div>
+
+    <div class="error" id="error"></div>
+
+    <div class="input-section">
+      <div class="input-group">
+        <input type="text" id="ideaInput" placeholder="Ex: Quero lançar SacoPex Oreo" />
+        <button onclick="generateCascade()">Gerar Cascata</button>
+      </div>
+      <div style="font-size: 12px; color: var(--navy-turtle);">
+        Escreva uma ideia simples. O engine extrai automaticamente produto, sabor e objetivo.
+      </div>
+    </div>
+
+    <div class="cascade-view" id="cascadeView">
+      <div class="cascade-diagram" id="cascadeDiagram"></div>
+      <div class="output-section" id="outputSection"></div>
+    </div>
+
+    <div class="loading" id="loading">
+      <span class="spinner"></span> Gerando cascata...
+    </div>
+  </div>
+
+  <script>
+    const BRAND = {
+      palette: ['#F5F1EB', '#1A2B3E', '#2D4A5C', '#E89B7E'],
+      paletteNames: ['Creme', 'Navy', 'Navy Tartaruga', 'Laranja Pastel'],
+      fonts: ['Manrope', 'Tiempos Text Italic'],
+      forbidden: {
+        health: /emagrece|cura|trata|saudável|sem açúcar|diet|zero cal|caloria negativa/i,
+        slang: /mano|véi|tipo assim|slk|mizeravi|c'mon|top|demais|brabo/i,
+        competitor: /concorrente|marca X|diferente de|melhor que/i,
+        falsepromises: /revolucionário|transforma|muda vidas|melhor do mundo/i
+      },
+      signature: 'SacoPex'
+    };
+
+    const PRODUTOS_DB = {
+      'Oreo': {
+        sabor: 'Oreo',
+        angulo: 'Nostalgia sofisticada',
+        publico: 'Millennials nostálgicos',
+        corPrimaria: '#2D4A5C'
+      },
+      'Morango': {
+        sabor: 'Morango',
+        angulo: 'Frescor natural',
+        publico: 'Público jovem',
+        corPrimaria: '#E89B7E'
+      }
+    };
+
+    const OBJETIVOS_MAP = {
+      'lançar': { pilar: 'Antecipação', emoções: ['expectativa', 'surpresa'] },
+      'vender': { pilar: 'Ação Imediata', emoções: ['urgência', 'desejo'] },
+      'engajar': { pilar: 'Conversa', emoções: ['curiosidade', 'pertencimento'] },
+      'descobrir': { pilar: 'Descoberta', emoções: ['encanto', 'curiosidade'] }
+    };
+
+    let cascadeState = {
+      bigIdea: null,
+      hooks: [],
+      reels: [],
+      stories: [],
+      carousel: null,
+      post: null,
+      legendas: [],
+      ads: [],
+      abVariations: []
+    };
+
+    function parseIdea(text) {
+      const lower = text.toLowerCase();
+      let produto = 'SacoPex';
+      let sabor = 'Oreo';
+      let objetivo = 'lançar';
+
+      if (lower.includes('oreo')) sabor = 'Oreo';
+      else if (lower.includes('morango')) sabor = 'Morango';
+
+      if (lower.includes('lançar')) objetivo = 'lançar';
+      else if (lower.includes('vender')) objetivo = 'vender';
+      else if (lower.includes('engajar')) objetivo = 'engajar';
+
+      return { produto, sabor, objetivo };
+    }
+
+    function updateCascadeDiagram(step) {
+      const steps = [
+        { name: 'Big Idea', count: 1 },
+        { name: 'Hooks', count: 3 },
+        { name: 'Reels', count: 2 },
+        { name: 'Stories', count: 3 },
+        { name: 'Carrossel', count: 1 },
+        { name: 'Post', count: 1 },
+        { name: 'Legendas', count: 3 },
+        { name: 'Anúncios', count: 2 },
+        { name: 'A/B Variations', count: 3 }
+      ];
+
+      let diagram = 'INPUT: "' + document.getElementById('ideaInput').value + '"\n';
+      diagram += '       ↓\n[PARSER]\n       ↓\n';
+
+      steps.forEach((s, i) => {
+        const isComplete = step > i;
+        const isCurrent = step === i;
+        const className = isComplete ? 'complete' : (isCurrent ? 'complete' : 'pending');
+
+        diagram += `<span class="${className}">[${s.name} GERADOR]</span>\n`;
+        diagram += `<span class="arrow">├─ ${s.count} ${s.name.toLowerCase()}</span>\n`;
+        if (i < steps.length - 1) diagram += '       ↓\n';
+      });
+
+      diagram += '\nOUTPUT: 20+ PEÇAS ✓';
+      document.getElementById('cascadeDiagram').innerHTML = diagram;
+    }
+
+    async function generateCascade() {
+      const idea = document.getElementById('ideaInput').value.trim();
+      if (!idea) {
+        showError('Digite uma ideia para começar');
+        return;
+      }
+
+      document.getElementById('cascadeView').classList.add('active');
+      document.getElementById('loading').classList.add('active');
+
+      const { produto, sabor, objetivo } = parseIdea(idea);
+      const prodData = PRODUTOS_DB[sabor] || PRODUTOS_DB['Oreo'];
+      const objData = OBJETIVOS_MAP[objetivo] || OBJETIVOS_MAP['lançar'];
+
+      try {
+        cascadeState = {
+          bigIdea: null,
+          hooks: [],
+          reels: [],
+          stories: [],
+          carousel: null,
+          post: null,
+          legendas: [],
+          ads: [],
+          abVariations: []
+        };
+
+        // Step 1: Big Idea
+        updateCascadeDiagram(0);
+        await delay(600);
+        cascadeState.bigIdea = generateBigIdea(prodData, objData);
+        addOutput('big-idea', `BIG IDEA\n\n${cascadeState.bigIdea}`, 0);
+
+        // Step 2: Hooks (3)
+        updateCascadeDiagram(1);
+        await delay(600);
+        cascadeState.hooks = generateHooks(cascadeState.bigIdea, objData, 3);
+        cascadeState.hooks.forEach((h, i) => {
+          addOutput(`hook-${i}`, `HOOK ${i + 1}\n\n${h}`, i + 1);
+        });
+
+        // Step 3: Reels (2)
+        updateCascadeDiagram(2);
+        await delay(600);
+        cascadeState.reels = generateReels(cascadeState.hooks, prodData, 2);
+        cascadeState.reels.forEach((r, i) => {
+          addOutput(`reel-${i}`, `REEL ${i + 1}\n\n${r}`, 4 + i);
+        });
+
+        // Step 4: Stories (3)
+        updateCascadeDiagram(3);
+        await delay(600);
+        cascadeState.stories = generateStories(cascadeState.bigIdea, prodData, 3);
+        cascadeState.stories.forEach((s, i) => {
+          addOutput(`story-${i}`, `STORY ${i + 1}\n\n${s}`, 6 + i);
+        });
+
+        // Step 5: Carrossel
+        updateCascadeDiagram(4);
+        await delay(600);
+        cascadeState.carousel = generateCarousel(cascadeState.bigIdea, cascadeState.hooks);
+        addOutput('carousel', `CARROSSEL (5 SLIDES)\n\n${cascadeState.carousel}`, 9);
+
+        // Step 6: Post
+        updateCascadeDiagram(5);
+        await delay(600);
+        cascadeState.post = generatePost(cascadeState.bigIdea, prodData);
+        addOutput('post', `POST FEED\n\n${cascadeState.post}`, 10);
+
+        // Step 7: Legendas (3)
+        updateCascadeDiagram(6);
+        await delay(600);
+        cascadeState.legendas = generateLegendas(cascadeState.bigIdea, 3);
+        cascadeState.legendas.forEach((l, i) => {
+          addOutput(`legenda-${i}`, `LEGENDA ${i + 1}\n\n${l}`, 11 + i);
+        });
+
+        // Step 8: Anúncios (2)
+        updateCascadeDiagram(7);
+        await delay(600);
+        cascadeState.ads = generateAds(cascadeState.hooks, 2);
+        cascadeState.ads.forEach((a, i) => {
+          addOutput(`ad-${i}`, `ANÚNCIO ${i + 1}\n\n${a}`, 14 + i);
+        });
+
+        // Step 9: A/B Variations (3)
+        updateCascadeDiagram(8);
+        await delay(600);
+        cascadeState.abVariations = generateABVariations(cascadeState.bigIdea, 3);
+        cascadeState.abVariations.forEach((v, i) => {
+          addOutput(`ab-${i}`, `VARIAÇÃO A/B ${i + 1}\n\n${v}`, 16 + i);
+        });
+
+        document.getElementById('loading').classList.remove('active');
+      } catch (e) {
+        showError('Erro ao gerar cascata: ' + e.message);
+        document.getElementById('loading').classList.remove('active');
+      }
+    }
+
+    function generateBigIdea(prodData, objData) {
+      const templates = [
+        `Quando ${objData.emoções[0]} é sofisticada`,
+        `${prodData.sabor} nunca foi tão ${prodData.angulo.split(' ')[0].toLowerCase()}`,
+        `O momento em que ${objData.emoções[1]} encontra qualidade`
+      ];
+      return templates[Math.floor(Math.random() * templates.length)];
+    }
+
+    function generateHooks(bigIdea, objData, count) {
+      const base = bigIdea;
+      return [
+        base,
+        `Aquele momento em que ${objData.emoções[0]} bate sofisticada`,
+        `Você merecia isso: ${base.toLowerCase()}`
+      ].slice(0, count);
+    }
+
+    function generateReels(hooks, prodData, count) {
+      return hooks.slice(0, count).map((hook, i) =>
+        `REEL ${i + 1}\n` +
+        `Hook: "${hook}"\n` +
+        `Duração: 15-22s\n` +
+        `Cena 1 (0-3s): Still-life ${prodData.sabor} sobre fundo Creme\n` +
+        `Cena 2 (3-10s): Close-up textura, gelo derretendo\n` +
+        `Cena 3 (10-15s): Mão consumindo, bokeh background\n` +
+        `Cena 4 (15-20s): Card Navy com oferta\n` +
+        `Cena 5 (20-22s): Assinatura SacoPex, fade to black`
+      );
+    }
+
+    function generateStories(bigIdea, prodData, count) {
+      const templates = [
+        `Story 1: "Expectativa"\n${bigIdea}\n\n→ Clique para ver`,
+        `Story 2: "Revelação"\n${prodData.sabor} chegou com tudo\n\n→ Peça já`,
+        `Story 3: "CTA"\n2 por R$10\n\n→ Link na bio`
+      ];
+      return templates.slice(0, count);
+    }
+
+    function generateCarousel(bigIdea, hooks) {
+      return `SLIDE 1: ${bigIdea}\nSLIDE 2: ${hooks[0]}\nSLIDE 3: Benefícios\nSLIDE 4: Oferta\nSLIDE 5: CTA + Hashtags`;
+    }
+
+    function generatePost(bigIdea, prodData) {
+      return `${bigIdea}.\n\n${prodData.sabor} nunca foi tão sofisticado. Sacolé SacoPex: qualidade sem compromisos.\n\n2 por R$10. Peça o seu.\n\n#SacoPex #${prodData.sabor} #MomentoSofisticado`;
+    }
+
+    function generateLegendas(bigIdea, count) {
+      return [
+        `${bigIdea}. Peça o seu.`,
+        `Quando sofisticação é simples. SacoPex Oreo 2x R$10`,
+        `Nostalgia sofisticada. Qualidade que você merecia, preço que você aprecia.`
+      ].slice(0, count);
+    }
+
+    function generateAds(hooks, count) {
+      return hooks.slice(0, count).map((h, i) =>
+        `ANÚNCIO ${i + 1}\nHeadline: "${h}"\nBody: Sacolé SacoPex. Qualidade premium, preço acessível.\nCTA: Peça Agora\nOferta: 2 por R$10`
+      );
+    }
+
+    function generateABVariations(bigIdea, count) {
+      return [
+        `Variação A: Emocional\n"${bigIdea}"`,
+        `Variação B: Racional\n"2 por R$10 — melhor preço do mercado"`,
+        `Variação C: Urgência\n"Antes que derreta — peça agora"`
+      ].slice(0, count);
+    }
+
+    function addOutput(id, content, index) {
+      const section = document.getElementById('outputSection');
+      const card = document.createElement('div');
+      card.className = 'artifact-card';
+      card.id = `card-${id}`;
+      card.innerHTML = `
+        <h3>${id.replace(/-/g, ' ').toUpperCase()}</h3>
+        <div class="content">${content}</div>
+      `;
+      section.appendChild(card);
+      setTimeout(() => card.classList.add('active'), 50);
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error');
+      el.textContent = msg;
+      el.classList.add('active');
+      setTimeout(() => el.classList.remove('active'), 5000);
+    }
+
+    function delay(ms) {
+      return new Promise(r => setTimeout(r, ms));
+    }
+
+    document.getElementById('ideaInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') generateCascade();
+    });
+  </script>
+</body>
+</html>
