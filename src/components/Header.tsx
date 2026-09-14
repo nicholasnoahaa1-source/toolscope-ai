@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { getCategories } from "@/lib/data";
+import type { Category } from "@/lib/types";
 
 export default async function Header() {
-  const categories = await getCategories();
+  let categories: Category[] = [];
+  try {
+    categories = await getCategories();
+  } catch (error) {
+    // Database unavailable during build - return empty categories
+    // The page will be properly rendered at runtime with categories
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/95 backdrop-blur">
