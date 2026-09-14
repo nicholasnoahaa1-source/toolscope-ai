@@ -9,18 +9,40 @@ let cachedPrisma: PrismaClient | null = null;
 let initFailed = false;
 
 // Stub object that mimics Prisma's shape for build-time failures
-const createStub = (): any => ({
-  $connect: async () => {},
-  $disconnect: async () => {},
-  category: {
+const createStub = (): any => {
+  const modelStub = {
     findMany: async () => [],
     findUnique: async () => null,
-  },
-  tool: {
-    findMany: async () => [],
-    findUnique: async () => null,
-  },
-});
+    create: async () => ({}),
+    update: async () => ({}),
+    delete: async () => ({}),
+    findFirst: async () => null,
+  };
+
+  return {
+    $connect: async () => {},
+    $disconnect: async () => {},
+    category: modelStub,
+    tool: modelStub,
+    analyticsMetric: modelStub,
+    analyticsContentGenerated: modelStub,
+    analyticsContentPublished: modelStub,
+    analyticsSyncLog: modelStub,
+    tag: modelStub,
+    pricingPlan: modelStub,
+    user: modelStub,
+    review: modelStub,
+    benchmark: modelStub,
+    favorite: modelStub,
+    collection: modelStub,
+    collectionTool: modelStub,
+    workflow: modelStub,
+    workflowStep: modelStub,
+    workflowTool: modelStub,
+    toolTag: modelStub,
+    toolEmbedding: modelStub,
+  };
+};
 
 export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
   get(target, prop) {
