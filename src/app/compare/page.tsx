@@ -2,6 +2,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { formatPrice, getAllTools } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Comparador de ferramentas de IA",
   description: "Compare preço, categoria, avaliação e tags de várias ferramentas de IA lado a lado.",

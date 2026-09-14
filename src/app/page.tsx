@@ -2,6 +2,9 @@ import Link from "next/link";
 import ToolCard from "@/components/ToolCard";
 import { getCategories, searchTools } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
 export default async function Home({
   searchParams,
 }: {
