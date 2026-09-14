@@ -4,16 +4,7 @@ import type { Metadata } from "next";
 import ToolCard from "@/components/ToolCard";
 import { getCategories, getCategoryBySlug, getToolsByCategory } from "@/lib/data";
 
-export async function generateStaticParams() {
-  try {
-    const categories = await getCategories();
-    return categories.map((category) => ({ slug: category.slug }));
-  } catch (error) {
-    console.warn("Could not generate static params for categories, using dynamic rendering:", error);
-    return [];
-  }
-}
-
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export async function generateMetadata({
