@@ -1,3 +1,13 @@
+// Check build environment at module load time
+const isBuildEnvAtLoad =
+  process.env.VERCEL === "1" ||
+  process.env.VERCEL === "true" ||
+  process.env.CI === "true" ||
+  process.env.GITHUB_ACTIONS === "true" ||
+  process.env.NETLIFY === "true" ||
+  process.env.BUILD_ID !== undefined ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
+
 let cachedPrisma: any = null;
 let initError: Error | null = null;
 
@@ -35,19 +45,14 @@ const prismaStub: any = {
 };
 
 const getPrisma = (): any => {
-  // Check if we're in a build environment (Vercel, GitHub Actions, etc)
-  const isBuildEnv =
-    process.env.VERCEL === "1" ||
-    process.env.VERCEL === "true" ||
-    process.env.CI === "true" ||
-    process.env.GITHUB_ACTIONS === "true" ||
-    process.env.NETLIFY === "true" ||
-    process.env.BUILD_ID !== undefined ||
-    process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
+  // If we detected build environment at module load time, use stub immediately
+  if (isBuildEnvAtLoad) {
+    return prismaStub;
+  }
 
+  // Also check at runtime in case environment changed
   const isDatabaseUnavailable = !process.env.DATABASE_URL;
-
-  if (isBuildEnv || isDatabaseUnavailable) {
+  if (isDatabaseUnavailable) {
     return prismaStub;
   }
 
