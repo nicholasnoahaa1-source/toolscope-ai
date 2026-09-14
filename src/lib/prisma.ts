@@ -7,53 +7,43 @@ const globalForPrisma = globalThis as unknown as {
 
 let cachedPrisma: PrismaClient | null = null;
 
-const prisma: PrismaClient = (() => {
-  // Return cached instance if available
-  if (cachedPrisma) {
-    return cachedPrisma;
-  }
-
-  if (globalForPrisma.prisma) {
-    cachedPrisma = globalForPrisma.prisma;
-    return cachedPrisma;
-  }
-
-  let options: any = {};
-  const databaseUrl = process.env.DATABASE_URL;
-
-  // Only create adapter if DATABASE_URL is provided
-  if (databaseUrl) {
-    try {
-      const adapter = new PrismaPg({ connectionString: databaseUrl });
-      options = { adapter };
-    } catch (error) {
-      console.warn("Failed to initialize PrismaPg adapter:", error instanceof Error ? error.message : String(error));
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(target, prop) {
+    if (cachedPrisma) return (cachedPrisma as any)[prop];
+    if (globalForPrisma.prisma) {
+      cachedPrisma = globalForPrisma.prisma;
+      return (cachedPrisma as any)[prop];
     }
-  }
 
-  try {
-    // Try to instantiate with options (if DATABASE_URL was set)
-    cachedPrisma = new PrismaClient(options);
-  } catch (error) {
-    console.warn("Failed to initialize Prisma client:", error instanceof Error ? error.message : String(error));
-    // Fallback: try without any options
-    try {
-      cachedPrisma = new PrismaClient();
-    } catch (finalError) {
-      console.error("Critical: Cannot instantiate PrismaClient:", finalError instanceof Error ? finalError.message : String(finalError));
-      throw finalError;
+    // Initialize on first access
+    let options: any = {};
+    const databaseUrl = process.env.DATABASE_URL;
+
+    if (databaseUrl) {
+      try {
+        const adapter = new PrismaPg({ connectionString: databaseUrl });
+        options = { adapter };
+      } catch (e) {
+        // Silently handle adapter errors
+      }
     }
-  }
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = cachedPrisma;
-  }
+    try {
+      cachedPrisma = new PrismaClient(
+        Object.keys(options).length > 0 ? options : {}
+      );
+    } catch (e) {
+      try {
+        cachedPrisma = new PrismaClient();
+      } catch {
+        throw new Error("Failed to initialize PrismaClient");
+      }
+    }
 
-  return cachedPrisma;
-})() as PrismaClient;
+    if (process.env.NODE_ENV !== "production") {
+      globalForPrisma.prisma = cachedPrisma;
+    }
 
-export { prisma };
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+    return (cachedPrisma as any)[prop];
+  },
+});
