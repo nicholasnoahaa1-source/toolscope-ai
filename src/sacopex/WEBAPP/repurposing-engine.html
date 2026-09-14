@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SacoPex Content Repurposing Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,110 +15,116 @@
       --navy: #1A2B3E;
       --navy-turtle: #2D4A5C;
       --laranja: #E89B7E;
-      --border: #ddd;
+      --white: #FFFFFF;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: "Crimson Text", Georgia, serif;
       background: var(--creme);
       color: var(--navy);
-      padding: 24px;
+      padding: 64px 24px;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1080px;
       margin: 0 auto;
     }
 
     .header {
-      text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 64px;
     }
 
     .header h1 {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 8px;
+      font-family: "Manrope", sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+      line-height: 1.1;
     }
 
     .header p {
-      font-size: 14px;
+      font-size: 16px;
+      font-style: italic;
       color: var(--navy-turtle);
     }
 
     .input-section {
-      background: white;
-      border: 2px solid var(--navy);
-      border-radius: 8px;
-      padding: 32px;
-      margin-bottom: 48px;
+      background: var(--white);
+      padding: 48px 40px;
+      border-left: 4px solid var(--laranja);
+      margin-bottom: 64px;
     }
 
     .input-group {
-      margin-bottom: 24px;
+      margin-bottom: 32px;
     }
 
     .input-group label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      font-family: "Manrope", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
       color: var(--navy);
     }
 
     textarea {
       width: 100%;
       padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 13px;
+      border: 1px solid rgba(26, 43, 62, 0.1);
+      font-size: 15px;
       font-family: inherit;
       resize: vertical;
       min-height: 100px;
+      background: var(--creme);
+      color: var(--navy);
     }
 
     textarea:focus {
       outline: none;
-      border-color: var(--navy);
-      box-shadow: 0 0 0 3px rgba(26, 43, 62, 0.1);
+      border-color: var(--laranja);
+      box-shadow: 0 0 0 2px rgba(232, 155, 126, 0.1);
     }
 
     .input-row {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
     }
 
     select {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 13px;
+      padding: 12px 14px;
+      border: 1px solid rgba(26, 43, 62, 0.1);
+      font-size: 14px;
       font-family: inherit;
       cursor: pointer;
+      background: var(--creme);
+      color: var(--navy);
     }
 
     select:focus {
       outline: none;
-      border-color: var(--navy);
+      border-color: var(--laranja);
     }
 
     .button-group {
       display: flex;
-      gap: 12px;
+      gap: 16px;
     }
 
     button {
-      padding: 12px 24px;
+      padding: 14px 28px;
       background: var(--navy);
-      color: white;
+      color: var(--white);
       border: none;
-      border-radius: 6px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 13px;
-      transition: background 0.2s;
+      font-size: 14px;
+      font-family: "Manrope", sans-serif;
+      transition: background 0.2s ease;
       flex: 1;
     }
 
@@ -135,25 +144,24 @@
 
     .platforms-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
     }
 
     .platform-checkbox {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      gap: 10px;
+      padding: 14px 16px;
+      border: 1px solid rgba(26, 43, 62, 0.1);
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .platform-checkbox:hover {
-      background: var(--creme);
-      border-color: var(--navy);
+      background: rgba(232, 155, 126, 0.05);
+      border-color: var(--laranja);
     }
 
     .platform-checkbox input[type="checkbox"] {
@@ -167,13 +175,13 @@
     .platform-checkbox label {
       cursor: pointer;
       margin: 0;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     .repurpose-view {
       display: none;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 48px;
     }
 
     .repurpose-view.active {
@@ -181,10 +189,9 @@
     }
 
     .diagram-panel {
-      background: white;
-      border: 2px solid var(--navy);
-      border-radius: 8px;
-      padding: 32px;
+      background: var(--white);
+      border-left: 4px solid var(--laranja);
+      padding: 40px 32px;
       font-family: monospace;
       font-size: 12px;
       line-height: 1.8;
@@ -196,14 +203,13 @@
     .outputs-panel {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 32px;
     }
 
     .output-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
+      background: var(--white);
+      border-left: 4px solid var(--laranja);
+      padding: 32px 28px;
       display: none;
     }
 
@@ -218,31 +224,29 @@
     }
 
     .output-card h3 {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 12px;
+      font-family: "Manrope", sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
       color: var(--navy);
-      border-bottom: 2px solid var(--laranja);
-      padding-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     }
 
     .platform-badge {
       display: inline-block;
       background: var(--laranja);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: sans-serif;
+      color: var(--white);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: "Manrope", sans-serif;
     }
 
     .output-card .content {
-      font-size: 12px;
-      line-height: 1.6;
+      font-size: 14px;
+      line-height: 1.7;
       color: var(--navy-turtle);
       max-height: 250px;
       overflow-y: auto;
@@ -251,11 +255,12 @@
     }
 
     .specs {
-      font-size: 11px;
-      color: #999;
-      margin-top: 12px;
-      border-top: 1px solid var(--border);
-      padding-top: 8px;
+      font-size: 12px;
+      color: var(--navy-turtle);
+      margin-top: 16px;
+      border-top: 1px solid rgba(26, 43, 62, 0.1);
+      padding-top: 12px;
+      font-style: italic;
     }
 
     .loading {
@@ -286,10 +291,9 @@
 
     .error {
       background: #ffe0e0;
-      border: 1px solid #ff9999;
+      border-left: 4px solid #d00;
       color: #c00;
-      padding: 16px;
-      border-radius: 6px;
+      padding: 16px 20px;
       display: none;
       margin-bottom: 24px;
     }
@@ -309,12 +313,24 @@
     }
 
     @media (max-width: 768px) {
+      body {
+        padding: 40px 16px;
+      }
+
+      .header {
+        margin-bottom: 40px;
+      }
+
       .header h1 {
-        font-size: 24px;
+        font-size: 36px;
       }
 
       .platforms-grid {
         grid-template-columns: repeat(2, 1fr);
+      }
+
+      .input-row {
+        grid-template-columns: 1fr;
       }
     }
   </style>

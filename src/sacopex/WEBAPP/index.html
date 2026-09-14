@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SacoPex Content OS — Central de Geração</title>
+  <title>SacoPex Content OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,110 +15,106 @@
       --navy: #1A2B3E;
       --navy-turtle: #2D4A5C;
       --laranja: #E89B7E;
-      --border: #ddd;
+      --white: #FFFFFF;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, var(--creme) 0%, #faf7f2 100%);
+      font-family: "Crimson Text", Georgia, serif;
+      background: var(--creme);
       color: var(--navy);
-      padding: 40px 24px;
+      padding: 64px 24px;
       min-height: 100vh;
     }
 
     .container {
-      max-width: 1000px;
+      max-width: 1080px;
       margin: 0 auto;
     }
 
     .header {
-      text-align: center;
-      margin-bottom: 64px;
+      margin-bottom: 96px;
     }
 
     .header h1 {
-      font-size: 48px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
+      font-family: "Manrope", sans-serif;
+      font-size: 56px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+      line-height: 1.1;
     }
 
     .header p {
-      font-size: 16px;
+      font-size: 18px;
+      font-style: italic;
       color: var(--navy-turtle);
-      margin-bottom: 12px;
+      margin-bottom: 4px;
+      font-weight: 400;
     }
 
     .header small {
-      font-size: 13px;
-      color: #999;
+      font-size: 14px;
+      color: var(--navy-turtle);
+      font-style: italic;
       display: block;
+      margin-top: 16px;
     }
 
     .engines-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-      gap: 32px;
-      margin-bottom: 48px;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 48px;
+      margin-bottom: 96px;
     }
 
     .engine-card {
-      background: white;
-      border: 2px solid var(--navy);
-      border-radius: 12px;
-      padding: 40px 32px;
-      text-align: center;
-      transition: all 0.3s;
+      background: var(--white);
+      padding: 48px 40px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
+      border-left: 4px solid var(--laranja);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .engine-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(26, 43, 62, 0.15);
+      transform: translateX(4px);
+      box-shadow: 0 8px 24px rgba(26, 43, 62, 0.08);
     }
 
     .engine-icon {
-      font-size: 56px;
+      font-size: 48px;
       line-height: 1;
     }
 
     .engine-card h2 {
-      font-size: 24px;
-      font-weight: 700;
+      font-family: "Manrope", sans-serif;
+      font-size: 28px;
+      font-weight: 800;
       color: var(--navy);
+      margin: 0;
     }
 
-    .engine-card p {
-      font-size: 14px;
+    .engine-card > p {
+      font-size: 16px;
       color: var(--navy-turtle);
-      line-height: 1.6;
-      flex: 1;
+      line-height: 1.7;
+      margin: 0;
     }
 
     .engine-features {
-      text-align: left;
-      background: var(--creme);
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 12px;
+      background: transparent;
+      border-top: 1px solid rgba(26, 43, 62, 0.1);
+      padding-top: 20px;
+      font-size: 14px;
       color: var(--navy-turtle);
+      line-height: 1.8;
     }
 
     .engine-features li {
       list-style: none;
-      margin-bottom: 8px;
-      padding-left: 20px;
-      position: relative;
-    }
-
-    .engine-features li:before {
-      content: "→";
-      position: absolute;
-      left: 0;
-      color: var(--laranja);
-      font-weight: bold;
+      margin-bottom: 10px;
+      padding-left: 0;
     }
 
     .engine-features li:last-child {
@@ -123,90 +122,101 @@
     }
 
     .engine-card a {
-      display: inline-block;
-      padding: 14px 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
       background: var(--navy);
-      color: white;
+      color: var(--white);
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
+      font-family: "Manrope", sans-serif;
+      font-weight: 700;
       font-size: 14px;
-      transition: background 0.2s;
+      transition: background 0.2s ease;
+      width: fit-content;
     }
 
     .engine-card a:hover {
       background: var(--navy-turtle);
     }
 
+    .engine-card a::after {
+      content: "→";
+    }
+
     .info-section {
-      background: white;
-      border: 2px solid var(--laranja);
-      border-radius: 8px;
-      padding: 32px;
-      margin-top: 48px;
+      background: var(--white);
+      padding: 56px 48px;
+      border-left: 4px solid var(--laranja);
+      margin-top: 96px;
     }
 
     .info-section h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 16px;
+      font-family: "Manrope", sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 28px;
       color: var(--navy);
     }
 
     .info-section p {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--navy-turtle);
       line-height: 1.8;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .info-section p:last-child {
       margin-bottom: 0;
     }
 
-    .brand-badge {
-      display: inline-block;
-      background: var(--laranja);
-      color: white;
-      padding: 3px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 600;
-      margin: 0 2px;
-    }
-
     .flow-diagram {
-      background: var(--creme);
-      border-radius: 8px;
-      padding: 24px;
-      margin-top: 24px;
-      font-family: monospace;
-      font-size: 12px;
-      color: var(--navy);
+      background: rgba(232, 155, 126, 0.08);
+      padding: 32px 24px;
+      margin-top: 32px;
+      font-family: "Manrope", monospace;
+      font-size: 13px;
+      color: var(--navy-turtle);
       text-align: center;
-      line-height: 2;
+      line-height: 1.8;
+      border-left: 4px solid var(--laranja);
     }
 
     @media (max-width: 768px) {
+      body {
+        padding: 40px 16px;
+      }
+
+      .header {
+        margin-bottom: 64px;
+      }
+
       .header h1 {
-        font-size: 32px;
+        font-size: 40px;
       }
 
       .engines-grid {
         grid-template-columns: 1fr;
-        gap: 24px;
+        gap: 32px;
+        margin-bottom: 64px;
       }
 
       .engine-card {
-        padding: 24px;
-      }
-
-      .engine-icon {
-        font-size: 40px;
+        padding: 32px 24px;
       }
 
       .engine-card h2 {
+        font-size: 22px;
+      }
+
+      .info-section {
+        padding: 32px 24px;
+        margin-top: 64px;
+      }
+
+      .info-section h3 {
         font-size: 20px;
+        margin-bottom: 20px;
       }
     }
   </style>

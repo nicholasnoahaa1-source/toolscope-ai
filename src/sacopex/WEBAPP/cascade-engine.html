@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SacoPex Cascade Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,77 +15,81 @@
       --navy: #1A2B3E;
       --navy-turtle: #2D4A5C;
       --laranja: #E89B7E;
-      --border: #ddd;
+      --white: #FFFFFF;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: "Crimson Text", Georgia, serif;
       background: var(--creme);
       color: var(--navy);
-      padding: 24px;
+      padding: 64px 24px;
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1080px;
       margin: 0 auto;
     }
 
     .header {
-      text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 64px;
     }
 
     .header h1 {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
+      font-family: "Manrope", sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+      line-height: 1.1;
     }
 
     .header p {
-      font-size: 14px;
+      font-size: 16px;
+      font-style: italic;
       color: var(--navy-turtle);
+      margin-bottom: 4px;
     }
 
     .input-section {
-      background: white;
-      border: 2px solid var(--navy);
-      border-radius: 8px;
-      padding: 32px;
-      margin-bottom: 48px;
+      background: var(--white);
+      padding: 48px 40px;
+      border-left: 4px solid var(--laranja);
+      margin-bottom: 64px;
     }
 
     .input-group {
       display: flex;
       gap: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     input[type="text"] {
       flex: 1;
       padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 14px;
+      border: 1px solid rgba(26, 43, 62, 0.1);
+      font-size: 15px;
       font-family: inherit;
+      background: var(--creme);
+      color: var(--navy);
     }
 
     input[type="text"]:focus {
       outline: none;
-      border-color: var(--navy);
-      box-shadow: 0 0 0 3px rgba(26, 43, 62, 0.1);
+      border-color: var(--laranja);
+      box-shadow: 0 0 0 2px rgba(232, 155, 126, 0.1);
     }
 
     button {
       padding: 14px 28px;
       background: var(--navy);
-      color: white;
+      color: var(--white);
       border: none;
-      border-radius: 6px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       font-size: 14px;
-      transition: background 0.2s;
+      font-family: "Manrope", sans-serif;
+      transition: background 0.2s ease;
     }
 
     button:hover {
@@ -93,6 +100,13 @@
       transform: scale(0.98);
     }
 
+    .input-section > div:last-child {
+      font-size: 13px;
+      color: var(--navy-turtle);
+      margin-top: 16px;
+      font-style: italic;
+    }
+
     .cascade-view {
       display: none;
     }
@@ -100,14 +114,13 @@
     .cascade-view.active {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 48px;
     }
 
     .cascade-diagram {
-      background: white;
-      border: 2px solid var(--navy);
-      border-radius: 8px;
-      padding: 32px;
+      background: var(--white);
+      border-left: 4px solid var(--laranja);
+      padding: 40px 32px;
       font-size: 12px;
       font-family: monospace;
       line-height: 1.8;
@@ -123,14 +136,13 @@
     .output-section {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 32px;
     }
 
     .artifact-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
+      background: var(--white);
+      border-left: 4px solid var(--laranja);
+      padding: 32px 28px;
       display: none;
     }
 
@@ -145,17 +157,16 @@
     }
 
     .artifact-card h3 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
+      font-family: "Manrope", sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
       color: var(--navy);
-      border-bottom: 2px solid var(--laranja);
-      padding-bottom: 8px;
     }
 
     .artifact-card .content {
-      font-size: 13px;
-      line-height: 1.6;
+      font-size: 14px;
+      line-height: 1.7;
       color: var(--navy-turtle);
       max-height: 300px;
       overflow-y: auto;
@@ -192,10 +203,9 @@
 
     .error {
       background: #ffe0e0;
-      border: 1px solid #ff9999;
+      border-left: 4px solid #d00;
       color: #c00;
-      padding: 16px;
-      border-radius: 6px;
+      padding: 16px 20px;
       display: none;
       margin-bottom: 24px;
     }
@@ -205,12 +215,20 @@
     }
 
     @media (max-width: 768px) {
-      .cascade-view.active {
-        grid-template-columns: 1fr;
+      body {
+        padding: 40px 16px;
+      }
+
+      .header {
+        margin-bottom: 40px;
       }
 
       .header h1 {
-        font-size: 24px;
+        font-size: 36px;
+      }
+
+      .cascade-view.active {
+        grid-template-columns: 1fr;
       }
 
       .input-group {
