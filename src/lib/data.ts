@@ -74,7 +74,7 @@ function mapTool(tool: ToolWithRelations): Tool {
 
 export async function getCategories(): Promise<Category[]> {
   const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
-  return categories.map((c) => ({
+  return categories.map((c: any) => ({
     slug: c.slug,
     name: c.name,
     description: c.description ?? "",

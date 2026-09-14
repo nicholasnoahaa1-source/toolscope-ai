@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 const modelStub = {
   findMany: async () => [],
@@ -33,30 +33,26 @@ const prismaStub: any = {
   toolEmbedding: modelStub,
 };
 
-let cachedPrisma: PrismaClient | null = null;
+let cachedPrisma: any = null;
 
-const getPrisma = (): PrismaClient | any => {
-  // During Vercel builds, always use stub to avoid initialization issues
-  if (process.env.VERCEL === "1") {
+const getPrisma = (): any => {
+  // During Vercel builds or when DATABASE_URL is unavailable, use stub immediately
+  if (process.env.VERCEL === "1" || !process.env.DATABASE_URL) {
     return prismaStub;
   }
 
   if (cachedPrisma) return cachedPrisma;
 
-  const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+  const globalForPrisma = globalThis as unknown as { prisma?: any };
   if (globalForPrisma.prisma) {
     cachedPrisma = globalForPrisma.prisma;
     return cachedPrisma;
   }
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    return prismaStub;
-  }
-
   try {
+    const { PrismaClient } = require("@prisma/client");
     const { PrismaPg } = require("@prisma/adapter-pg");
-    const adapter = new PrismaPg({ connectionString: databaseUrl });
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
     cachedPrisma = new PrismaClient({ adapter });
 
     if (process.env.NODE_ENV !== "production") {

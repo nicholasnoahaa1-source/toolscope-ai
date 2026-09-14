@@ -10,16 +10,16 @@ export async function GET(request: NextRequest) {
     const published = await prisma.analyticsContentPublished.findMany();
 
     // Calculate basic stats
-    const totalViews = metrics.reduce((sum, m) => sum + m.views, 0);
-    const totalOrders = metrics.reduce((sum, m) => sum + m.orders, 0);
-    const totalRevenue = metrics.reduce((sum, m) => sum + m.revenue, 0);
+    const totalViews = metrics.reduce((sum: number, m: any) => sum + (m.views || 0), 0);
+    const totalOrders = metrics.reduce((sum: number, m: any) => sum + (m.orders || 0), 0);
+    const totalRevenue = metrics.reduce((sum: number, m: any) => sum + (m.revenue || 0), 0);
     const avgEngagement =
       metrics.length > 0
         ? (
-            metrics.reduce((sum, m) => {
+            metrics.reduce((sum: number, m: any) => {
               const eng =
                 m.views > 0
-                  ? ((m.likes + m.comments * 2 + m.shares * 3 + m.saves * 2) /
+                  ? (((m.likes || 0) + (m.comments || 0) * 2 + (m.shares || 0) * 3 + (m.saves || 0) * 2) /
                       m.views) *
                     100
                   : 0;
