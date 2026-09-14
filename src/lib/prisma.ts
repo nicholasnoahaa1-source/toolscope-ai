@@ -36,11 +36,14 @@ const prismaStub: any = {
 
 const getPrisma = (): any => {
   // Check if we're in a build environment (Vercel, GitHub Actions, etc)
-  // or if DATABASE_URL is not set or points to an invalid location
   const isBuildEnv =
     process.env.VERCEL === "1" ||
+    process.env.VERCEL === "true" ||
     process.env.CI === "true" ||
-    process.env.GITHUB_ACTIONS === "true";
+    process.env.GITHUB_ACTIONS === "true" ||
+    process.env.NETLIFY === "true" ||
+    process.env.BUILD_ID !== undefined ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
 
   const isDatabaseUnavailable = !process.env.DATABASE_URL;
 
