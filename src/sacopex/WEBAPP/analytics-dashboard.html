@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - SacoPex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --creme: #F5F1EB;
+      --navy: #1A2B3E;
+      --navy-turtle: #2D4A5C;
+      --laranja: #E89B7E;
+      --white: #FFFFFF;
+      --red: #D97757;
+      --yellow: #F4B942;
+      --green: #6BAE6E;
+    }
+
+    body {
+      font-family: "Crimson Text", Georgia, serif;
+      background: var(--creme);
+      color: var(--navy);
+      padding: 64px 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 48px;
+    }
+
+    .header h1 {
+      font-family: "Manrope", sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: var(--navy-turtle);
+      font-style: italic;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: "Manrope", sans-serif;
+      transition: all 0.2s ease;
+      border-radius: 3px;
+    }
+
+    button:hover {
+      background: var(--navy-turtle);
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--navy);
+      border: 1px solid var(--navy);
+    }
+
+    button.secondary:hover {
+      background: rgba(26, 43, 62, 0.05);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .card {
+      background: var(--white);
+      border-left: 4px solid var(--laranja);
+      padding: 32px;
+      border-radius: 3px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .card h2 {
+      font-family: "Manrope", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--navy);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 12px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .metric-box {
+      background: var(--creme);
+      padding: 16px;
+      border-radius: 3px;
+      text-align: center;
+      border-left: 3px solid var(--laranja);
+    }
+
+    .metric-box .label {
+      font-size: 12px;
+      color: var(--navy-turtle);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .metric-box .value {
+      font-family: "Manrope", sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .recommendations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .recommendation-card {
+      background: var(--creme);
+      padding: 16px;
+      border-left: 4px solid var(--laranja);
+      border-radius: 3px;
+    }
+
+    .recommendation-card.critical {
+      border-left-color: var(--red);
+      background: rgba(217, 119, 87, 0.08);
+    }
+
+    .recommendation-card.high {
+      border-left-color: #E89B7E;
+      background: rgba(232, 155, 126, 0.08);
+    }
+
+    .recommendation-card.medium {
+      border-left-color: var(--yellow);
+      background: rgba(244, 185, 66, 0.08);
+    }
+
+    .recommendation-card .priority {
+      display: inline-block;
+      font-family: "Manrope", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border-radius: 2px;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .recommendation-card.critical .priority {
+      background: var(--red);
+      color: var(--white);
+    }
+
+    .recommendation-card.high .priority {
+      background: #E89B7E;
+      color: var(--white);
+    }
+
+    .recommendation-card.medium .priority {
+      background: var(--yellow);
+      color: var(--navy);
+    }
+
+    .recommendation-card .title {
+      font-family: "Manrope", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--navy);
+    }
+
+    .recommendation-card .insight {
+      font-size: 13px;
+      color: var(--navy-turtle);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .recommendation-card .action {
+      font-size: 12px;
+      color: var(--navy);
+      background: var(--white);
+      padding: 8px;
+      border-radius: 2px;
+      font-family: "Manrope", sans-serif;
+      border-left: 2px solid var(--laranja);
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--green);
+      margin-bottom: 24px;
+    }
+
+    .status.loading {
+      color: var(--navy-turtle);
+    }
+
+    .status.error {
+      color: var(--red);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .status.loading .status-dot {
+      background: var(--navy-turtle);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .status.error .status-dot {
+      background: var(--red);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--navy-turtle);
+    }
+
+    .empty-state p {
+      font-size: 15px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .hook-badge {
+      display: inline-block;
+      background: var(--laranja);
+      color: var(--white);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 2px;
+      font-family: "Manrope", sans-serif;
+    }
+
+    .format-badge {
+      display: inline-block;
+      background: var(--navy);
+      color: var(--white);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 2px;
+      font-family: "Manrope", sans-serif;
+    }
+
+    .top-performers {
+      background: var(--creme);
+      padding: 16px;
+      border-radius: 3px;
+      margin-top: 16px;
+    }
+
+    .top-performers .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(26, 43, 62, 0.1);
+      font-size: 13px;
+    }
+
+    .top-performers .item:last-child {
+      border-bottom: none;
+    }
+
+    .top-performers .content {
+      flex: 1;
+    }
+
+    .top-performers .name {
+      font-family: "Manrope", sans-serif;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+
+    .top-performers .stats {
+      font-size: 12px;
+      color: var(--navy-turtle);
+    }
+
+    .top-performers .rate {
+      font-family: "Manrope", sans-serif;
+      font-weight: 700;
+      color: var(--laranja);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📊 Analytics Dashboard</h1>
+      <p>Padrões de desempenho e recomendações data-driven</p>
+    </div>
+
+    <div class="controls">
+      <button onclick="loadDashboard()">Atualizar Dashboard</button>
+      <button class="secondary" onclick="exportData()">Exportar Dados</button>
+    </div>
+
+    <div id="status" class="status loading">
+      <span class="status-dot"></span>
+      <span id="statusText">Carregando dados...</span>
+    </div>
+
+    <div id="dashboard" style="display: none;">
+      <div class="dashboard-grid">
+        <!-- Hook Performance Card -->
+        <div class="card">
+          <h2>Hook Performance</h2>
+          <div class="chart-container">
+            <canvas id="hookChart"></canvas>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <div class="label">Top Hook</div>
+              <div class="value" id="topHook">—</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Total Peças</div>
+              <div class="value" id="totalPieces">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Format Performance Card -->
+        <div class="card">
+          <h2>Format Distribution</h2>
+          <div class="chart-container">
+            <canvas id="formatChart"></canvas>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <div class="label">Top Format</div>
+              <div class="value" id="topFormat">—</div>
+            </div>
+            <div class="metric-box">
+              <div class="label">Avg Engagement</div>
+              <div class="value" id="avgEngagement">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conversion Drivers Card -->
+        <div class="card">
+          <h2>Conversion Drivers</h2>
+          <div class="chart-container">
+            <canvas id="conversionChart"></canvas>
+          </div>
+          <div class="top-performers">
+            <div id="topConverters"></div>
+          </div>
+        </div>
+
+        <!-- Best Performing Pattern Card -->
+        <div class="card">
+          <h2>Winning Combination</h2>
+          <div id="bestPattern" style="padding: 20px 0;">
+            <div style="margin-bottom: 20px;">
+              <div style="font-size: 12px; color: var(--navy-turtle); margin-bottom: 8px; text-transform: uppercase; font-weight: 500;">Hook Type</div>
+              <div id="bestHook"></div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: var(--navy-turtle); margin-bottom: 8px; text-transform: uppercase; font-weight: 500;">Content Format</div>
+              <div id="bestFormatDisplay"></div>
+            </div>
+            <div style="margin-top: 20px; padding: 16px; background: var(--creme); border-left: 3px solid var(--laranja); border-radius: 3px;">
+              <div style="font-size: 12px; color: var(--navy-turtle); margin-bottom: 4px; font-weight: 500;">Aplicar no Cascade Engine</div>
+              <div style="font-size: 13px; color: var(--navy); line-height: 1.4;" id="patternAdvice"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommendations Section -->
+      <div class="card">
+        <h2>Recomendações Prioritizadas</h2>
+        <div class="recommendations-list" id="recommendationsList"></div>
+      </div>
+
+      <!-- Data Summary -->
+      <div style="margin-top: 32px; padding: 24px; background: var(--white); border-left: 4px solid var(--navy-turtle); border-radius: 3px; font-size: 13px; color: var(--navy-turtle);">
+        <div style="font-family: 'Manrope', sans-serif; font-weight: 600; margin-bottom: 8px; color: var(--navy);">Última atualização</div>
+        <div id="lastUpdate">—</div>
+      </div>
+    </div>
+
+    <div id="emptyState" class="empty-state">
+      <p>Nenhuma métrica encontrada.</p>
+      <p style="font-size: 13px;">Gere e publique conteúdo com o Cascade Engine para começar a ver análises.</p>
+    </div>
+  </div>
+
+  <script src="analytics-engine.js"></script>
+  <script>
+    let charts = {};
+    let analyticsData = null;
+
+    async function loadDashboard() {
+      const statusEl = document.getElementById('status');
+      const statusText = document.getElementById('statusText');
+      const dashboard = document.getElementById('dashboard');
+      const emptyState = document.getElementById('emptyState');
+
+      statusEl.classList.remove('error');
+      statusEl.classList.add('loading');
+      statusText.textContent = 'Carregando dados...';
+
+      try {
+        const db = await new Promise((resolve, reject) => {
+          const req = indexedDB.open('sacopex-analytics');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+
+        const tx = db.transaction('metrics-collected', 'readonly');
+        const store = tx.objectStore('metrics-collected');
+        const metricsReq = store.getAll();
+
+        metricsReq.onsuccess = async () => {
+          if (metricsReq.result.length === 0) {
+            statusEl.classList.remove('loading');
+            dashboard.style.display = 'none';
+            emptyState.style.display = 'block';
+            statusText.textContent = 'Nenhuma métrica disponível';
+            return;
+          }
+
+          const engine = new AnalyticsEngine(db);
+          const [hookPerf, formatPerf, drivers, recommendations] = await Promise.all([
+            engine.getHookPerformance(),
+            engine.getFormatPerformance(),
+            engine.getConversionDrivers(),
+            engine.getGenerationRecommendations()
+          ]);
+
+          analyticsData = { hookPerf, formatPerf, drivers, recommendations, timestamp: new Date().toISOString() };
+
+          renderDashboard(analyticsData);
+
+          dashboard.style.display = 'block';
+          emptyState.style.display = 'none';
+          statusEl.classList.remove('loading');
+          statusText.textContent = '✓ Dados carregados com sucesso';
+        };
+      } catch (e) {
+        statusEl.classList.remove('loading');
+        statusEl.classList.add('error');
+        statusText.textContent = 'Erro ao carregar dados: ' + e.message;
+        dashboard.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+    }
+
+    function renderDashboard(data) {
+      const { hookPerf, formatPerf, drivers, recommendations } = data;
+
+      // Update hook metrics
+      document.getElementById('topHook').textContent = hookPerf[0]?.hookType || '—';
+      document.getElementById('totalPieces').textContent = hookPerf.reduce((sum, h) => sum + h.count, 0);
+
+      // Update format metrics
+      document.getElementById('topFormat').textContent = formatPerf[0]?.format || '—';
+      document.getElementById('avgEngagement').textContent = (formatPerf[0]?.avgEngagement || 0) + '%';
+
+      // Hook Performance Chart
+      if (charts.hook) charts.hook.destroy();
+      const hookCtx = document.getElementById('hookChart').getContext('2d');
+      charts.hook = new Chart(hookCtx, {
+        type: 'bar',
+        data: {
+          labels: hookPerf.slice(0, 6).map(h => h.hookType),
+          datasets: [{
+            label: 'Total Orders',
+            data: hookPerf.slice(0, 6).map(h => h.totalOrders),
+            backgroundColor: '#E89B7E',
+            borderRadius: 3,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      // Format Performance Chart
+      if (charts.format) charts.format.destroy();
+      const formatCtx = document.getElementById('formatChart').getContext('2d');
+      charts.format = new Chart(formatCtx, {
+        type: 'doughnut',
+        data: {
+          labels: formatPerf.map(f => f.format),
+          datasets: [{
+            data: formatPerf.map(f => f.count),
+            backgroundColor: ['#1A2B3E', '#E89B7E', '#2D4A5C', '#F4B942', '#6BAE6E'],
+            borderColor: '#F5F1EB',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+
+      // Conversion Chart
+      if (charts.conversion) charts.conversion.destroy();
+      const convCtx = document.getElementById('conversionChart').getContext('2d');
+      const convData = [
+        { name: 'Top Converters', value: drivers.topConverters[0]?.conversionRate || 0 },
+        { name: 'Avg', value: ((drivers.topConverters[0]?.conversionRate || 0) + (drivers.lowConverters[0]?.conversionRate || 0)) / 2 },
+        { name: 'Bottom Performers', value: drivers.lowConverters[0]?.conversionRate || 0 }
+      ];
+      charts.conversion = new Chart(convCtx, {
+        type: 'bar',
+        data: {
+          labels: convData.map(d => d.name),
+          datasets: [{
+            label: 'Conversion Rate %',
+            data: convData.map(d => parseFloat(d.value)),
+            backgroundColor: ['#6BAE6E', '#F4B942', '#D97757'],
+            borderRadius: 3,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      // Top Converters
+      const convertersHtml = drivers.topConverters.slice(0, 3).map(c => `
+        <div class="item">
+          <div class="content">
+            <div class="name">${c.contentId}</div>
+            <div class="stats">${c.hook} • ${c.format}</div>
+          </div>
+          <div class="rate">${c.conversionRate}%</div>
+        </div>
+      `).join('');
+      document.getElementById('topConverters').innerHTML = convertersHtml || '<div style="text-align: center; color: var(--navy-turtle); padding: 16px;">Sem dados disponíveis</div>';
+
+      // Best Pattern
+      if (drivers.topConverters[0]) {
+        const best = drivers.topConverters[0];
+        document.getElementById('bestHook').innerHTML = `<span class="hook-badge">${best.hook}</span>`;
+        document.getElementById('bestFormatDisplay').innerHTML = `<span class="format-badge">${best.format}</span>`;
+        document.getElementById('patternAdvice').textContent =
+          `Replicar combinação: ${best.hook} + ${best.format}. Conversion rate: ${best.conversionRate}%`;
+      }
+
+      // Recommendations
+      const recHtml = recommendations.map(r => `
+        <div class="recommendation-card ${r.priority}">
+          <div class="priority">${r.priority}</div>
+          <div class="title">${r.title}</div>
+          <div class="insight">${r.insight}</div>
+          <div class="action">▸ ${r.action}</div>
+        </div>
+      `).join('');
+      document.getElementById('recommendationsList').innerHTML = recHtml;
+
+      // Last update
+      document.getElementById('lastUpdate').textContent =
+        new Date(data.timestamp).toLocaleString('pt-BR', {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        });
+    }
+
+    function exportData() {
+      if (!analyticsData) {
+        alert('Carregue os dados primeiro');
+        return;
+      }
+
+      const json = JSON.stringify(analyticsData, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    window.addEventListener('load', loadDashboard);
+  </script>
+</body>
+</html>
