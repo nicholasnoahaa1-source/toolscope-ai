@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Engine — SacoPex Content OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --creme: #F5F1EB;
+      --navy: #1A2B3E;
+      --navy-turtle: #2D4A5C;
+      --laranja: #E89B7E;
+      --white: #FFFFFF;
+      --success: #4CAF50;
+      --danger: #d00;
+      --warning: #FF9800;
+    }
+
+    body {
+      font-family: "Crimson Text", Georgia, serif;
+      background: var(--creme);
+      color: var(--navy);
+      padding: 64px 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 48px;
+      border-bottom: 1px solid rgba(26, 43, 62, 0.1);
+      padding-bottom: 32px;
+    }
+
+    .header h1 {
+      font-family: "Manrope", sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+
+    .header p {
+      font-size: 16px;
+      font-style: italic;
+      color: var(--navy-turtle);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 48px;
+      border-bottom: 1px solid rgba(26, 43, 62, 0.1);
+      padding-bottom: 16px;
+    }
+
+    .nav-tabs button {
+      font-family: "Manrope", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: none;
+      border: none;
+      color: var(--navy-turtle);
+      cursor: pointer;
+      padding: 8px 0;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tabs button.active {
+      color: var(--navy);
+      border-bottom-color: var(--laranja);
+    }
+
+    .nav-tabs button:hover:not(.active) {
+      color: var(--navy);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section {
+      background: var(--white);
+      padding: 48px 40px;
+      border-left: 4px solid var(--laranja);
+      margin-bottom: 48px;
+    }
+
+    .section h2 {
+      font-family: "Manrope", sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 24px;
+    }
+
+    .section h3 {
+      font-family: "Manrope", sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    .section p {
+      font-size: 16px;
+      color: var(--navy-turtle);
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    label {
+      font-family: "Manrope", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      font-family: "Crimson Text", Georgia, serif;
+      font-size: 16px;
+      background: var(--creme);
+      border: 1px solid rgba(26, 43, 62, 0.1);
+      color: var(--navy);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      font-size: 14px;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--laranja);
+      background: var(--white);
+    }
+
+    button {
+      font-family: "Manrope", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 14px 24px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: var(--navy-turtle);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--navy);
+      border: 1px solid var(--navy);
+      margin-left: 12px;
+    }
+
+    button.secondary:hover {
+      background: rgba(26, 43, 62, 0.05);
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    button.danger:hover {
+      background: #b00;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .status-message {
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      border-left: 4px solid;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .status-message.success {
+      border-left-color: var(--success);
+      color: #2e7d32;
+    }
+
+    .status-message.error {
+      border-left-color: var(--danger);
+      color: #c62828;
+    }
+
+    .status-message.warning {
+      border-left-color: var(--warning);
+      color: #e65100;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+    }
+
+    thead {
+      background: rgba(26, 43, 62, 0.05);
+    }
+
+    th {
+      font-family: "Manrope", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(26, 43, 62, 0.1);
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid rgba(26, 43, 62, 0.05);
+      font-size: 14px;
+    }
+
+    tbody tr:hover {
+      background: rgba(232, 155, 126, 0.03);
+    }
+
+    .metric-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(26, 43, 62, 0.1);
+      border-radius: 3px;
+      font-size: 12px;
+      font-family: "Manrope", sans-serif;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .metric-high {
+      color: var(--success);
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .metric-low {
+      color: var(--danger);
+      background: rgba(208, 0, 0, 0.1);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--navy-turtle);
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .stats-card {
+      background: rgba(232, 155, 126, 0.08);
+      padding: 24px;
+      border-left: 4px solid var(--laranja);
+    }
+
+    .stats-card h4 {
+      font-family: "Manrope", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy-turtle);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stats-card .big-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--navy);
+      font-family: "Manrope", sans-serif;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 40px 16px;
+      }
+
+      .header {
+        margin-bottom: 32px;
+        padding-bottom: 20px;
+      }
+
+      .header h1 {
+        font-size: 36px;
+      }
+
+      .section {
+        padding: 32px 24px;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-tabs {
+        gap: 16px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      td, th {
+        padding: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Analytics Engine</h1>
+      <p>Coleta, armazenamento e análise de desempenho de conteúdo</p>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-tab="import">Importar Dados</button>
+      <button class="tab-btn" data-tab="collected">Dados Coletados</button>
+      <button class="tab-btn" data-tab="patterns">Padrões & Insights</button>
+    </div>
+
+    <!-- TAB 1: IMPORT -->
+    <div id="import" class="tab-content active">
+      <div class="section">
+        <h2>Importar Métricas de Plataformas</h2>
+        <p>Cole aqui os dados JSON exportados do Instagram Insights, Meta Ads Manager, TikTok Analytics ou outras plataformas. O sistema irá processar e armazenar localmente.</p>
+
+        <div class="form-group">
+          <label for="platform-select">Plataforma de Origem</label>
+          <select id="platform-select">
+            <option value="">-- Selecione --</option>
+            <option value="instagram">Instagram Insights</option>
+            <option value="tiktok">TikTok Analytics</option>
+            <option value="meta">Meta Ads Manager</option>
+            <option value="youtube">YouTube Analytics</option>
+            <option value="custom">Formato Personalizado</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="json-input">Cole o JSON Aqui</label>
+          <textarea id="json-input" placeholder='[{"views": 1200, "likes": 45, "comments": 12, "shares": 3, "url": "https://instagram.com/p/..."}]'></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="content-id">Content ID (UUID da peça gerada)</label>
+          <input type="text" id="content-id" placeholder="Ex: cascade-oreo-001 ou deixe em branco para mapeamento manual">
+        </div>
+
+        <div id="import-status"></div>
+
+        <div class="button-group">
+          <button onclick="importMetrics()">Importar & Armazenar</button>
+          <button class="secondary" onclick="clearJsonInput()">Limpar</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Mapeamento de URLs</h2>
+        <p>Se os dados importados não tiverem contentIds, use esta seção para vincular URLs publicadas aos IDs das peças geradas.</p>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="url-input">URL Publicada</label>
+            <input type="url" id="url-input" placeholder="https://instagram.com/p/ABC123/">
+          </div>
+          <div class="form-group">
+            <label for="id-input">Content ID</label>
+            <input type="text" id="id-input" placeholder="cascade-oreo-001">
+          </div>
+        </div>
+
+        <button onclick="mapUrlToId()">Vincular URL → ID</button>
+
+        <div id="mappings-list" style="margin-top: 24px;"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: COLLECTED DATA -->
+    <div id="collected" class="tab-content">
+      <div class="section">
+        <h2>Dados Coletados</h2>
+        <p>Todos os dados são armazenados localmente no seu navegador (IndexedDB). Nenhum dado é enviado para servidores externos.</p>
+
+        <div id="data-stats" class="grid-2"></div>
+
+        <div id="data-table-container">
+          <div class="empty-state">
+            <p>Nenhum dado coletado ainda. Comece importando métricas na aba "Importar Dados".</p>
+          </div>
+        </div>
+
+        <div class="button-group" style="margin-top: 32px;">
+          <button class="secondary" onclick="exportDataAsJson()">Exportar como JSON</button>
+          <button class="secondary" onclick="exportDataAsCSV()">Exportar como CSV</button>
+          <button class="danger" onclick="clearAllData()">Apagar Todos os Dados</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: PATTERNS & INSIGHTS -->
+    <div id="patterns" class="tab-content">
+      <div class="section">
+        <h2>Análise de Padrões</h2>
+        <p>O sistema analisa os dados coletados para identificar padrões de desempenho que informarão a próxima geração de conteúdo.</p>
+
+        <div id="patterns-container">
+          <div class="empty-state">
+            <p>Insira mais dados (mín. 5 peças) para análise de padrões.</p>
+          </div>
+        </div>
+
+        <button class="secondary" onclick="runPatternAnalysis()" style="margin-top: 24px;">Executar Análise</button>
+      </div>
+
+      <div class="section">
+        <h2>Recomendações para Próxima Geração</h2>
+        <div id="recommendations-container">
+          <div class="empty-state">
+            <p>Recomendações aparecerão após análise de padrões.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // IndexedDB SETUP
+    // ============================================
+    let db;
+    const DB_NAME = 'sacopex-analytics';
+    const DB_VERSION = 1;
+
+    function initDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          db = request.result;
+          resolve(db);
+        };
+
+        request.onupgradeneeded = (e) => {
+          db = e.target.result;
+
+          // Object stores
+          if (!db.objectStoreNames.contains('content-generated')) {
+            db.createObjectStore('content-generated', { keyPath: 'contentId' });
+          }
+          if (!db.objectStoreNames.contains('content-published')) {
+            db.createObjectStore('content-published', { keyPath: 'contentId' });
+          }
+          if (!db.objectStoreNames.contains('metrics-collected')) {
+            db.createObjectStore('metrics-collected', { keyPath: 'contentId' });
+          }
+          if (!db.objectStoreNames.contains('url-mappings')) {
+            db.createObjectStore('url-mappings', { keyPath: 'url' });
+          }
+        };
+      });
+    }
+
+    // ============================================
+    // TAB SWITCHING
+    // ============================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabName = btn.dataset.tab;
+
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+
+        if (tabName === 'collected') {
+          displayCollectedData();
+        } else if (tabName === 'patterns') {
+          displayPatterns();
+        }
+      });
+    });
+
+    // ============================================
+    // IMPORT METRICS
+    // ============================================
+    function importMetrics() {
+      const jsonText = document.getElementById('json-input').value.trim();
+      const platform = document.getElementById('platform-select').value;
+      const contentId = document.getElementById('content-id').value.trim();
+      const statusEl = document.getElementById('import-status');
+
+      if (!jsonText) {
+        showStatus(statusEl, 'error', 'Cole um JSON válido antes de importar');
+        return;
+      }
+
+      try {
+        const data = JSON.parse(jsonText);
+        const metrics = Array.isArray(data) ? data : [data];
+
+        const tx = db.transaction('metrics-collected', 'readwrite');
+        const store = tx.objectStore('metrics-collected');
+
+        metrics.forEach((metric, idx) => {
+          const id = contentId || `imported-${Date.now()}-${idx}`;
+          const record = {
+            contentId: id,
+            metrics: {
+              views: metric.views || 0,
+              likes: metric.likes || 0,
+              comments: metric.comments || 0,
+              shares: metric.shares || 0,
+              saves: metric.saves || 0,
+              clicks: metric.clicks || 0,
+              orders: metric.orders || 0,
+              revenue: metric.revenue || 0
+            },
+            url: metric.url || '',
+            platform: platform || 'unknown',
+            collectedAt: new Date().toISOString()
+          };
+          store.put(record);
+        });
+
+        tx.oncomplete = () => {
+          showStatus(statusEl, 'success', `✓ ${metrics.length} métrica(s) importada(s) com sucesso`);
+          document.getElementById('json-input').value = '';
+          document.getElementById('content-id').value = '';
+        };
+
+        tx.onerror = () => {
+          showStatus(statusEl, 'error', 'Erro ao armazenar dados');
+        };
+      } catch (e) {
+        showStatus(statusEl, 'error', `JSON inválido: ${e.message}`);
+      }
+    }
+
+    // ============================================
+    // URL MAPPING
+    // ============================================
+    function mapUrlToId() {
+      const url = document.getElementById('url-input').value.trim();
+      const contentId = document.getElementById('id-input').value.trim();
+
+      if (!url || !contentId) {
+        alert('Preencha URL e Content ID');
+        return;
+      }
+
+      const tx = db.transaction('url-mappings', 'readwrite');
+      const store = tx.objectStore('url-mappings');
+      store.put({ url, contentId, mappedAt: new Date().toISOString() });
+
+      tx.oncomplete = () => {
+        document.getElementById('url-input').value = '';
+        document.getElementById('id-input').value = '';
+        displayMappings();
+      };
+    }
+
+    function displayMappings() {
+      const tx = db.transaction('url-mappings', 'readonly');
+      const store = tx.objectStore('url-mappings');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const mappings = request.result;
+        const container = document.getElementById('mappings-list');
+
+        if (mappings.length === 0) {
+          container.innerHTML = '<p style="color: var(--navy-turtle); margin-top: 16px;">Nenhum mapeamento ainda.</p>';
+          return;
+        }
+
+        let html = '<table style="margin-top: 16px;"><thead><tr><th>URL</th><th>Content ID</th></tr></thead><tbody>';
+        mappings.forEach(m => {
+          html += `<tr><td>${m.url}</td><td><strong>${m.contentId}</strong></td></tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      };
+    }
+
+    // ============================================
+    // DISPLAY COLLECTED DATA
+    // ============================================
+    function displayCollectedData() {
+      const tx = db.transaction('metrics-collected', 'readonly');
+      const store = tx.objectStore('metrics-collected');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const records = request.result;
+        const container = document.getElementById('data-table-container');
+        const statsEl = document.getElementById('data-stats');
+
+        if (records.length === 0) {
+          container.innerHTML = '<div class="empty-state"><p>Nenhum dado coletado ainda.</p></div>';
+          statsEl.innerHTML = '';
+          return;
+        }
+
+        // Stats cards
+        const totalViews = records.reduce((sum, r) => sum + (r.metrics.views || 0), 0);
+        const totalOrders = records.reduce((sum, r) => sum + (r.metrics.orders || 0), 0);
+        const totalRevenue = records.reduce((sum, r) => sum + (r.metrics.revenue || 0), 0);
+        const avgEngagement = records.length > 0
+          ? (records.reduce((sum, r) => sum + (r.metrics.likes + r.metrics.comments + r.metrics.shares), 0) / records.length).toFixed(1)
+          : 0;
+
+        statsEl.innerHTML = `
+          <div class="stats-card">
+            <h4>Total de Visualizações</h4>
+            <div class="big-number">${totalViews.toLocaleString()}</div>
+          </div>
+          <div class="stats-card">
+            <h4>Total de Pedidos</h4>
+            <div class="big-number">${totalOrders}</div>
+          </div>
+          <div class="stats-card">
+            <h4>Receita Total</h4>
+            <div class="big-number">R$ ${totalRevenue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+          </div>
+          <div class="stats-card">
+            <h4>Eng. Médio por Peça</h4>
+            <div class="big-number">${avgEngagement}</div>
+          </div>
+        `;
+
+        // Data table
+        let html = '<table><thead><tr><th>Content ID</th><th>Platform</th><th>Views</th><th>Likes</th><th>Comments</th><th>Orders</th><th>Revenue</th><th>Data</th></tr></thead><tbody>';
+
+        records.forEach(r => {
+          const date = new Date(r.collectedAt).toLocaleDateString('pt-BR');
+          html += `
+            <tr>
+              <td><strong>${r.contentId}</strong></td>
+              <td>${r.platform}</td>
+              <td>${r.metrics.views.toLocaleString()}</td>
+              <td>${r.metrics.likes}</td>
+              <td>${r.metrics.comments}</td>
+              <td><span class="metric-badge metric-high">${r.metrics.orders}</span></td>
+              <td>R$ ${r.metrics.revenue.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td>${date}</td>
+            </tr>
+          `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      };
+    }
+
+    // ============================================
+    // PATTERN ANALYSIS
+    // ============================================
+    function runPatternAnalysis() {
+      const tx = db.transaction('metrics-collected', 'readonly');
+      const store = tx.objectStore('metrics-collected');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const records = request.result;
+
+        if (records.length < 5) {
+          alert('Insira pelo menos 5 peças com dados para análise de padrões.');
+          return;
+        }
+
+        // Simple pattern analysis
+        const highPerformers = records
+          .sort((a, b) => (b.metrics.views + b.metrics.orders * 100) - (a.metrics.views + a.metrics.orders * 100))
+          .slice(0, 3);
+
+        const orderConverters = records
+          .filter(r => r.metrics.orders > 0)
+          .sort((a, b) => b.metrics.orders - a.metrics.orders)
+          .slice(0, 3);
+
+        const container = document.getElementById('patterns-container');
+        let html = '';
+
+        if (highPerformers.length > 0) {
+          html += '<h3>Top 3 Peças por Performance</h3>';
+          highPerformers.forEach((r, idx) => {
+            html += `
+              <div class="stats-card" style="margin-bottom: 12px;">
+                <strong>#${idx + 1}: ${r.contentId}</strong><br>
+                <small>${r.metrics.views} views | ${r.metrics.likes} likes | ${r.metrics.orders} pedidos</small>
+              </div>
+            `;
+          });
+        }
+
+        if (orderConverters.length > 0) {
+          html += '<h3 style="margin-top: 32px;">Top 3 Conversoras (Pedidos)</h3>';
+          orderConverters.forEach((r, idx) => {
+            const conversionRate = ((r.metrics.orders / (r.metrics.views || 1)) * 100).toFixed(2);
+            html += `
+              <div class="stats-card" style="margin-bottom: 12px;">
+                <strong>#${idx + 1}: ${r.contentId}</strong><br>
+                <small>${r.metrics.orders} pedidos | Taxa: ${conversionRate}% | R$ ${r.metrics.revenue.toFixed(2)}</small>
+              </div>
+            `;
+          });
+        }
+
+        container.innerHTML = html || '<p>Sem padrões detectados ainda.</p>';
+      };
+    }
+
+    function displayPatterns() {
+      const tx = db.transaction('metrics-collected', 'readonly');
+      const store = tx.objectStore('metrics-collected');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const records = request.result;
+
+        if (records.length < 5) {
+          document.getElementById('patterns-container').innerHTML = '<div class="empty-state"><p>Insira pelo menos 5 peças com dados.</p></div>';
+          return;
+        }
+
+        runPatternAnalysis();
+      };
+    }
+
+    // ============================================
+    // EXPORT DATA
+    // ============================================
+    function exportDataAsJson() {
+      const tx = db.transaction('metrics-collected', 'readonly');
+      const store = tx.objectStore('metrics-collected');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const data = request.result;
+        const json = JSON.stringify(data, null, 2);
+        downloadFile(json, 'sacopex-analytics.json', 'application/json');
+      };
+    }
+
+    function exportDataAsCSV() {
+      const tx = db.transaction('metrics-collected', 'readonly');
+      const store = tx.objectStore('metrics-collected');
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const records = request.result;
+        const headers = ['Content ID', 'Platform', 'Views', 'Likes', 'Comments', 'Shares', 'Saves', 'Clicks', 'Orders', 'Revenue', 'Collected At'];
+        const rows = records.map(r => [
+          r.contentId,
+          r.platform,
+          r.metrics.views,
+          r.metrics.likes,
+          r.metrics.comments,
+          r.metrics.shares || 0,
+          r.metrics.saves || 0,
+          r.metrics.clicks || 0,
+          r.metrics.orders,
+          r.metrics.revenue,
+          r.collectedAt
+        ]);
+
+        let csv = headers.join(',') + '\n';
+        rows.forEach(row => {
+          csv += row.map(val => `"${val}"`).join(',') + '\n';
+        });
+
+        downloadFile(csv, 'sacopex-analytics.csv', 'text/csv');
+      };
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ============================================
+    // CLEAR DATA
+    // ============================================
+    function clearAllData() {
+      if (!confirm('Tem certeza? Isso irá apagar TODOS os dados coletados. Esta ação é irreversível.')) {
+        return;
+      }
+
+      const tx = db.transaction(['metrics-collected', 'content-published', 'content-generated', 'url-mappings'], 'readwrite');
+      ['metrics-collected', 'content-published', 'content-generated', 'url-mappings'].forEach(store => {
+        tx.objectStore(store).clear();
+      });
+
+      tx.oncomplete = () => {
+        alert('Todos os dados foram apagados.');
+        displayCollectedData();
+      };
+    }
+
+    function clearJsonInput() {
+      document.getElementById('json-input').value = '';
+    }
+
+    // ============================================
+    // UTILITIES
+    // ============================================
+    function showStatus(el, type, message) {
+      el.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+      setTimeout(() => {
+        el.innerHTML = '';
+      }, 5000);
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    initDB().then(() => {
+      displayMappings();
+      console.log('Analytics Engine initialized');
+    }).catch(err => {
+      console.error('DB init failed:', err);
+      alert('Erro ao inicializar banco de dados. Seu navegador pode não suportar IndexedDB.');
+    });
+  </script>
+</body>
+</html>
