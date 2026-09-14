@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getCategories } from "@/lib/data";
 
 export default async function Footer() {
-  const categories = await getCategories();
+  // Ver Header: o rodapé degrada para uma lista vazia se o banco não responder.
+  const categories = await getCategories().catch(() => []);
 
   return (
     <footer className="mt-16 border-t border-border bg-surface">
