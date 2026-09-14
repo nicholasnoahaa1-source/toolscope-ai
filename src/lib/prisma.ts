@@ -6,10 +6,13 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 let cachedPrisma: PrismaClient | null = null;
+let cachedStub: any = null;
 let initFailed = false;
 
 // Stub object that mimics Prisma's shape for build-time failures
 const createStub = (): any => {
+  if (cachedStub) return cachedStub;
+
   const modelStub = {
     findMany: async () => [],
     findUnique: async () => null,
@@ -19,7 +22,7 @@ const createStub = (): any => {
     findFirst: async () => null,
   };
 
-  return {
+  cachedStub = {
     $connect: async () => {},
     $disconnect: async () => {},
     category: modelStub,
@@ -42,6 +45,8 @@ const createStub = (): any => {
     toolTag: modelStub,
     toolEmbedding: modelStub,
   };
+
+  return cachedStub;
 };
 
 export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
