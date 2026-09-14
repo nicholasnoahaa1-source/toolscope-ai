@@ -70,8 +70,26 @@ const getPrisma = (): any => {
   }
 
   try {
-    const { PrismaClient } = require("@prisma/client");
-    const { PrismaPg } = require("@prisma/adapter-pg");
+    // Wrap the requires in a secondary try-catch
+    let PrismaClient: any;
+    let PrismaPg: any;
+
+    try {
+      PrismaClient = require("@prisma/client").PrismaClient;
+    } catch (e) {
+      // If we can't load @prisma/client, fall back to stub
+      initError = e as Error;
+      return prismaStub;
+    }
+
+    try {
+      PrismaPg = require("@prisma/adapter-pg").PrismaPg;
+    } catch (e) {
+      // If we can't load @prisma/adapter-pg, fall back to stub
+      initError = e as Error;
+      return prismaStub;
+    }
+
     const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
     cachedPrisma = new PrismaClient({ adapter });
 
