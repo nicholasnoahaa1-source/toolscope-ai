@@ -1,4 +1,5 @@
-import type { PrismaClient } from "@prisma/client";
+let cachedPrisma: any = null;
+let initError: Error | null = null;
 
 const modelStub = {
   findMany: async () => [],
@@ -33,8 +34,6 @@ const prismaStub: any = {
   toolEmbedding: modelStub,
 };
 
-let cachedPrisma: any = null;
-
 const getPrisma = (): any => {
   // During Vercel builds or when DATABASE_URL is unavailable, use stub immediately
   if (process.env.VERCEL === "1" || !process.env.DATABASE_URL) {
@@ -43,6 +42,11 @@ const getPrisma = (): any => {
 
   if (cachedPrisma) return cachedPrisma;
 
+  // If we previously hit an error, use stub
+  if (initError) {
+    return prismaStub;
+  }
+
   const globalForPrisma = globalThis as unknown as { prisma?: any };
   if (globalForPrisma.prisma) {
     cachedPrisma = globalForPrisma.prisma;
@@ -50,8 +54,24 @@ const getPrisma = (): any => {
   }
 
   try {
-    const { PrismaClient } = require("@prisma/client");
-    const { PrismaPg } = require("@prisma/adapter-pg");
+    // Use require with error handling to load Prisma client
+    let PrismaClient: any;
+    let PrismaPg: any;
+
+    try {
+      PrismaClient = require("@prisma/client").PrismaClient;
+    } catch (e) {
+      initError = e as Error;
+      return prismaStub;
+    }
+
+    try {
+      PrismaPg = require("@prisma/adapter-pg").PrismaPg;
+    } catch (e) {
+      initError = e as Error;
+      return prismaStub;
+    }
+
     const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
     cachedPrisma = new PrismaClient({ adapter });
 
@@ -61,11 +81,12 @@ const getPrisma = (): any => {
 
     return cachedPrisma;
   } catch (e) {
+    initError = e as Error;
     return prismaStub;
   }
 };
 
-export const prisma = new Proxy({} as PrismaClient, {
+export const prisma = new Proxy({} as any, {
   get(target, prop) {
     const client = getPrisma();
     return (client as any)[prop];
