@@ -1,4 +1,3 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
@@ -80,6 +79,9 @@ export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
         initFailed = true;
         return (createStub() as any)[prop];
       }
+
+      // Lazy import PrismaPg adapter only when needed
+      const { PrismaPg } = require("@prisma/adapter-pg");
 
       // Initialize with adapter
       const adapter = new PrismaPg({ connectionString: databaseUrl });
