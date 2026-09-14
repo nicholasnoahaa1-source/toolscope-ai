@@ -1,14 +1,226 @@
-// Prisma schema para testes locais com SQLite
-// Use este arquivo para dev/test local, então migre para Supabase em produção
-
-datasource db {
-  provider = "sqlite"
-  url      = "file:./analytics.db"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PricingModel {
+  FREE
+  FREEMIUM
+  PAID
+  USAGE_BASED
+  CONTACT_SALES
+}
+
+enum ToolStatus {
+  ACTIVE
+  BETA
+  DEPRECATED
+  ACQUIRED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  FLAGGED
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  parentId    String?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryHierarchy")
+  tools       Tool[]
+  createdAt   DateTime   @default(now())
+
+  @@index([parentId])
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String    @unique
+  slug  String    @unique
+  tools ToolTag[]
+}
+
+model Tool {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  name            String
+  tagline         String
+  description     String
+  websiteUrl      String
+  logoUrl         String?
+  pricingModel    PricingModel  @default(FREEMIUM)
+  status          ToolStatus    @default(ACTIVE)
+  foundedYear     Int?
+  complianceScore Int?
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id])
+  tags            ToolTag[]
+  pricingPlans    PricingPlan[]
+  reviews         Review[]
+  benchmarks      Benchmark[]
+  favorites       Favorite[]
+  workflowSteps   WorkflowTool[]
+  collections     CollectionTool[]
+  embedding       ToolEmbedding?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([categoryId, status])
+  @@index([name])
+}
+
+model ToolTag {
+  toolId String
+  tagId  String
+  tool   Tool   @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([toolId, tagId])
+}
+
+model PricingPlan {
+  id            String   @id @default(cuid())
+  toolId        String
+  tool          Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  name          String
+  priceUsdCents Int?
+  billingCycle  String?
+  featuresJson  Json?
+  createdAt     DateTime @default(now())
+
+  @@index([toolId])
+}
+
+model User {
+  id          String       @id @default(cuid())
+  email       String       @unique
+  name        String?
+  plan        String       @default("free")
+  reviews     Review[]
+  favorites   Favorite[]
+  collections Collection[]
+  createdAt   DateTime     @default(now())
+}
+
+model Review {
+  id          String       @id @default(cuid())
+  toolId      String
+  tool        Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating      Int
+  title       String
+  body        String
+  status      ReviewStatus @default(PENDING)
+  helpfulCount Int         @default(0)
+  createdAt   DateTime     @default(now())
+
+  @@index([toolId, status])
+}
+
+model Benchmark {
+  id             String   @id @default(cuid())
+  toolId         String
+  tool           Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  taskType       String
+  prompt         String
+  outputRef      String?
+  latencyMs      Int?
+  costUsdCents   Int?
+  qualityScore   Int?
+  evaluatorModel String?
+  runAt          DateTime @default(now())
+
+  @@index([toolId, taskType])
+}
+
+model Favorite {
+  userId String
+  toolId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool   Tool   @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, toolId])
+}
+
+model Collection {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  slug      String?
+  description String?
+  isPublic  Boolean            @default(false)
+  tools     CollectionTool[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([userId])
+}
+
+model CollectionTool {
+  collectionId String
+  toolId       String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  tool         Tool       @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  addedAt      DateTime   @default(now())
+
+  @@id([collectionId, toolId])
+}
+
+model Workflow {
+  id          String        @id @default(cuid())
+  userId      String?
+  name        String
+  description String?
+  isPublic    Boolean       @default(false)
+  steps       WorkflowStep[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model WorkflowStep {
+  id         String       @id @default(cuid())
+  workflowId String
+  workflow   Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  stepNumber Int
+  tools      WorkflowTool[]
+  inputSchema Json?
+  outputSchema Json?
+  createdAt  DateTime     @default(now())
+
+  @@index([workflowId, stepNumber])
+}
+
+model WorkflowTool {
+  stepId String
+  toolId String
+  step   WorkflowStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  tool   Tool         @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@id([stepId, toolId])
+}
+
+model ToolEmbedding {
+  id        String   @id @default(cuid())
+  toolId    String   @unique
+  tool      Tool     @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  embedding Bytes
+  createdAt DateTime @default(now())
+
+  @@index([toolId])
+}
+
+// ===== Phase 4: Analytics Models =====
 
 model AnalyticsMetric {
   id        String   @id @default(cuid())

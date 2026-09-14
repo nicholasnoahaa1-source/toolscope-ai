@@ -5,9 +5,16 @@ import { formatPrice, getToolBySlug } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 
 export async function generateStaticParams() {
-  const tools = await prisma.tool.findMany({ select: { slug: true } });
-  return tools.map((tool) => ({ slug: tool.slug }));
+  try {
+    const tools = await prisma.tool.findMany({ select: { slug: true } });
+    return tools.map((tool) => ({ slug: tool.slug }));
+  } catch (error) {
+    console.warn("Could not generate static params for tools, using dynamic rendering:", error);
+    return [];
+  }
 }
+
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,

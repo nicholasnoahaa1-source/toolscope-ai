@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,11 +11,11 @@ export async function GET(request: NextRequest) {
     if (cascadeId) {
       content = await prisma.analyticsContentGenerated.findMany({
         where: { cascadeId },
-        orderBy: { generatedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
       });
     } else {
       content = await prisma.analyticsContentGenerated.findMany({
-        orderBy: { generatedAt: 'desc' },
+        orderBy: { createdAt: 'desc' },
         take: parseInt(limit),
       });
     }
@@ -35,22 +33,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { contentId, contentType, cascadeId, hookType, metadata } = body;
+    const { cascadeId, contentType, contentData, llmModel, duration } = body;
 
-    if (!contentId) {
+    if (!cascadeId) {
       return NextResponse.json(
-        { success: false, error: 'contentId is required' },
+        { success: false, error: 'cascadeId is required' },
         { status: 400 }
       );
     }
 
     const content = await prisma.analyticsContentGenerated.create({
       data: {
-        contentId,
-        contentType,
         cascadeId,
-        hookType,
-        metadata,
+        contentType: contentType || 'post',
+        contentData: contentData || '',
+        llmModel: llmModel || 'claude-3-sonnet',
+        duration: duration || 0,
       },
     });
 
