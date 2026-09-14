@@ -35,8 +35,16 @@ const prismaStub: any = {
 };
 
 const getPrisma = (): any => {
-  // During Vercel builds or when DATABASE_URL is unavailable, use stub immediately
-  if (process.env.VERCEL === "1" || !process.env.DATABASE_URL) {
+  // Check if we're in a build environment (Vercel, GitHub Actions, etc)
+  // or if DATABASE_URL is not set or points to an invalid location
+  const isBuildEnv =
+    process.env.VERCEL === "1" ||
+    process.env.CI === "true" ||
+    process.env.GITHUB_ACTIONS === "true";
+
+  const isDatabaseUnavailable = !process.env.DATABASE_URL;
+
+  if (isBuildEnv || isDatabaseUnavailable) {
     return prismaStub;
   }
 
@@ -54,24 +62,8 @@ const getPrisma = (): any => {
   }
 
   try {
-    // Use require with error handling to load Prisma client
-    let PrismaClient: any;
-    let PrismaPg: any;
-
-    try {
-      PrismaClient = require("@prisma/client").PrismaClient;
-    } catch (e) {
-      initError = e as Error;
-      return prismaStub;
-    }
-
-    try {
-      PrismaPg = require("@prisma/adapter-pg").PrismaPg;
-    } catch (e) {
-      initError = e as Error;
-      return prismaStub;
-    }
-
+    const { PrismaClient } = require("@prisma/client");
+    const { PrismaPg } = require("@prisma/adapter-pg");
     const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
     cachedPrisma = new PrismaClient({ adapter });
 
