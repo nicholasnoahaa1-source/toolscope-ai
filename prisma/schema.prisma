@@ -2,9 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// PostgreSQL provider for production compatibility
+// In Prisma 7, the connection URL is specified in prisma.config.ts or via adapter in PrismaClient
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
 enum PricingModel {

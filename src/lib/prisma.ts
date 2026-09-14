@@ -7,13 +7,15 @@ const globalForPrisma = globalThis as unknown as {
 
 let prismaClientOptions: any = {};
 
-// Only use PrismaPg adapter if DATABASE_URL is available (runtime)
-if (process.env.DATABASE_URL) {
+// Only use PrismaPg adapter for PostgreSQL (matching the schema provider)
+const databaseUrl = process.env.DATABASE_URL;
+
+if (databaseUrl) {
   try {
-    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg({ connectionString: databaseUrl });
     prismaClientOptions = { adapter };
   } catch (error) {
-    console.warn("Failed to initialize PrismaPg adapter, using default", error);
+    console.warn("Failed to initialize PrismaPg adapter", error);
   }
 }
 
@@ -22,11 +24,22 @@ if (globalForPrisma.prisma) {
   prisma = globalForPrisma.prisma;
 } else {
   try {
-    prisma = new PrismaClient(prismaClientOptions);
+    // Prisma 7 requires an adapter for PostgreSQL provider
+    if (Object.keys(prismaClientOptions).length > 0) {
+      prisma = new PrismaClient(prismaClientOptions);
+    } else {
+      // Try without adapter (might fail if DATABASE_URL is not set)
+      prisma = new PrismaClient();
+    }
   } catch (error) {
-    console.warn("Failed to initialize Prisma client with adapter, using default", error);
-    // Fallback to basic client without options for build-time safety
-    prisma = new PrismaClient();
+    console.warn("Failed to initialize Prisma client", error);
+    // Try one more time without options
+    try {
+      prisma = new PrismaClient();
+    } catch (finalError) {
+      console.error("Critical: Cannot instantiate PrismaClient", finalError);
+      throw finalError;
+    }
   }
 }
 
