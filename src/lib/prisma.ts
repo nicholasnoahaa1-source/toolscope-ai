@@ -2,46 +2,55 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+  prisma?: PrismaClient;
 };
 
-let prismaClientOptions: any = {};
+let cachedPrisma: PrismaClient | null = null;
 
-// Only use PrismaPg adapter for PostgreSQL (matching the schema provider)
-const databaseUrl = process.env.DATABASE_URL;
-
-if (databaseUrl) {
-  try {
-    const adapter = new PrismaPg({ connectionString: databaseUrl });
-    prismaClientOptions = { adapter };
-  } catch (error) {
-    console.warn("Failed to initialize PrismaPg adapter", error);
+const prisma: PrismaClient = (() => {
+  // Return cached instance if available
+  if (cachedPrisma) {
+    return cachedPrisma;
   }
-}
 
-let prisma: PrismaClient;
-if (globalForPrisma.prisma) {
-  prisma = globalForPrisma.prisma;
-} else {
-  try {
-    // Prisma 7 requires an adapter for PostgreSQL provider
-    if (Object.keys(prismaClientOptions).length > 0) {
-      prisma = new PrismaClient(prismaClientOptions);
-    } else {
-      // Try without adapter (might fail if DATABASE_URL is not set)
-      prisma = new PrismaClient();
-    }
-  } catch (error) {
-    console.warn("Failed to initialize Prisma client", error);
-    // Try one more time without options
+  if (globalForPrisma.prisma) {
+    cachedPrisma = globalForPrisma.prisma;
+    return cachedPrisma;
+  }
+
+  let options: any = {};
+  const databaseUrl = process.env.DATABASE_URL;
+
+  // Only create adapter if DATABASE_URL is provided
+  if (databaseUrl) {
     try {
-      prisma = new PrismaClient();
+      const adapter = new PrismaPg({ connectionString: databaseUrl });
+      options = { adapter };
+    } catch (error) {
+      console.warn("Failed to initialize PrismaPg adapter:", error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  try {
+    // Try to instantiate with options (if DATABASE_URL was set)
+    cachedPrisma = new PrismaClient(options);
+  } catch (error) {
+    console.warn("Failed to initialize Prisma client:", error instanceof Error ? error.message : String(error));
+    // Fallback: try without any options
+    try {
+      cachedPrisma = new PrismaClient();
     } catch (finalError) {
-      console.error("Critical: Cannot instantiate PrismaClient", finalError);
+      console.error("Critical: Cannot instantiate PrismaClient:", finalError instanceof Error ? finalError.message : String(finalError));
       throw finalError;
     }
   }
-}
+
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = cachedPrisma;
+  }
+
+  return cachedPrisma;
+})() as PrismaClient;
 
 export { prisma };
 
