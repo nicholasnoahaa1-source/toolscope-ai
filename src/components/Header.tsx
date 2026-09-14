@@ -24,6 +24,12 @@ export default async function Header() {
 
         <div className="flex items-center gap-3">
           <Link
+            href="/arquivo"
+            className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-brand hover:text-brand"
+          >
+            Arquivo
+          </Link>
+          <Link
             href="/compare"
             className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-brand hover:text-brand"
           >
