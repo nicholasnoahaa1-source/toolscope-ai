@@ -8,6 +8,19 @@ const isBuildEnvAtLoad =
   process.env.BUILD_ID !== undefined ||
   process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined;
 
+// Validate that DATABASE_URL looks like a valid PostgreSQL connection string
+const isValidDatabaseUrl = (url?: string): boolean => {
+  if (!url) return false;
+  // Must start with postgres:// or postgresql://
+  if (!url.startsWith("postgres://") && !url.startsWith("postgresql://")) {
+    return false;
+  }
+  // Must have basic structure: postgres://user:password@host:port/database
+  // At minimum, it should contain @ and : for basic credentials
+  if (!url.includes("@")) return false;
+  return true;
+};
+
 let cachedPrisma: any = null;
 let initError: Error | null = null;
 
@@ -51,7 +64,8 @@ const getPrisma = (): any => {
   }
 
   // Also check at runtime in case environment changed
-  const isDatabaseUnavailable = !process.env.DATABASE_URL;
+  // Use strict validation: DATABASE_URL must exist AND be a valid PostgreSQL connection string
+  const isDatabaseUnavailable = !isValidDatabaseUrl(process.env.DATABASE_URL);
   if (isDatabaseUnavailable) {
     return prismaStub;
   }
