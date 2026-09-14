@@ -6,44 +6,47 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 let cachedPrisma: PrismaClient | null = null;
+let initError: Error | null = null;
 
 export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
   get(target, prop) {
-    if (cachedPrisma) return (cachedPrisma as any)[prop];
+    // Check if we already have a cached instance or global one
+    if (cachedPrisma) {
+      return (cachedPrisma as any)[prop];
+    }
+
     if (globalForPrisma.prisma) {
       cachedPrisma = globalForPrisma.prisma;
       return (cachedPrisma as any)[prop];
     }
 
-    // Initialize on first access
-    let options: any = {};
-    const databaseUrl = process.env.DATABASE_URL;
-
-    if (databaseUrl) {
-      try {
-        const adapter = new PrismaPg({ connectionString: databaseUrl });
-        options = { adapter };
-      } catch (e) {
-        // Silently handle adapter errors
-      }
+    // If we already tried to initialize and failed, return stub
+    if (initError) {
+      return undefined;
     }
 
     try {
-      cachedPrisma = new PrismaClient(
-        Object.keys(options).length > 0 ? options : {}
-      );
-    } catch (e) {
-      try {
-        cachedPrisma = new PrismaClient();
-      } catch {
-        throw new Error("Failed to initialize PrismaClient");
+      const databaseUrl = process.env.DATABASE_URL;
+
+      let options: any = {};
+      if (databaseUrl) {
+        const adapter = new PrismaPg({ connectionString: databaseUrl });
+        options = { adapter };
       }
-    }
 
-    if (process.env.NODE_ENV !== "production") {
-      globalForPrisma.prisma = cachedPrisma;
-    }
+      cachedPrisma = new PrismaClient(
+        Object.keys(options).length > 0 ? options : undefined
+      );
 
-    return (cachedPrisma as any)[prop];
+      if (process.env.NODE_ENV !== "production") {
+        globalForPrisma.prisma = cachedPrisma;
+      }
+
+      return (cachedPrisma as any)[prop];
+    } catch (e) {
+      // Cache the error and return undefined to allow graceful degradation
+      initError = e instanceof Error ? e : new Error(String(e));
+      return undefined;
+    }
   },
 });
