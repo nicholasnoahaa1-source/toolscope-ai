@@ -83,7 +83,51 @@ const getPrisma = (): any => {
 
 export const prisma = new Proxy({} as any, {
   get(target, prop) {
+    // Handle internal properties and inspection methods
+    if (prop === Symbol.toStringTag || prop === "constructor" || prop === Symbol.toPrimitive) {
+      return undefined;
+    }
+
     const client = getPrisma();
     return (client as any)[prop];
   },
+
+  has(target, prop) {
+    // Return true for known model names to help with property checks
+    const knownModels = [
+      "category", "tool", "analyticsMetric", "analyticsContentGenerated",
+      "analyticsContentPublished", "analyticsSyncLog", "tag", "pricingPlan",
+      "user", "review", "benchmark", "favorite", "collection", "collectionTool",
+      "workflow", "workflowStep", "workflowTool", "toolTag", "toolEmbedding",
+      "$connect", "$disconnect"
+    ];
+    return knownModels.includes(String(prop));
+  },
+
+  ownKeys(target) {
+    // Return known model names for Object.keys() and similar operations
+    return [
+      "category", "tool", "analyticsMetric", "analyticsContentGenerated",
+      "analyticsContentPublished", "analyticsSyncLog", "tag", "pricingPlan",
+      "user", "review", "benchmark", "favorite", "collection", "collectionTool",
+      "workflow", "workflowStep", "workflowTool", "toolTag", "toolEmbedding",
+      "$connect", "$disconnect"
+    ];
+  },
+
+  getOwnPropertyDescriptor(target, prop) {
+    // Describe properties for introspection
+    const knownModels = [
+      "category", "tool", "analyticsMetric", "analyticsContentGenerated",
+      "analyticsContentPublished", "analyticsSyncLog", "tag", "pricingPlan",
+      "user", "review", "benchmark", "favorite", "collection", "collectionTool",
+      "workflow", "workflowStep", "workflowTool", "toolTag", "toolEmbedding",
+      "$connect", "$disconnect"
+    ];
+
+    if (knownModels.includes(String(prop))) {
+      return { configurable: true, enumerable: true, value: {} };
+    }
+    return undefined;
+  }
 });
