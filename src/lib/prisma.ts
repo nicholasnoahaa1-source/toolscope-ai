@@ -17,8 +17,20 @@ if (process.env.DATABASE_URL) {
   }
 }
 
-export const prisma =
-  globalForPrisma.prisma ?? new PrismaClient(prismaClientOptions);
+let prisma: PrismaClient;
+if (globalForPrisma.prisma) {
+  prisma = globalForPrisma.prisma;
+} else {
+  try {
+    prisma = new PrismaClient(prismaClientOptions);
+  } catch (error) {
+    console.warn("Failed to initialize Prisma client with adapter, using default", error);
+    // Fallback to basic client without options for build-time safety
+    prisma = new PrismaClient();
+  }
+}
+
+export { prisma };
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
