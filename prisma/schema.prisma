@@ -199,3 +199,62 @@ model ToolEmbedding {
   // O vetor em si fica em uma coluna pgvector adicionada via migration raw SQL
   // (Prisma ainda não modela `vector` nativamente neste schema).
 }
+
+// ============================================
+// SACOPEX ANALYTICS MODELS (Phase 4)
+// ============================================
+
+model AnalyticsMetric {
+  id        String   @id @default(cuid())
+  contentId String
+  views     Int      @default(0)
+  likes     Int      @default(0)
+  comments  Int      @default(0)
+  shares    Int      @default(0)
+  saves     Int      @default(0)
+  orders    Int      @default(0)
+  revenue   Float    @default(0)
+  platform  String?  // instagram, tiktok, youtube, etc
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([contentId])
+  @@index([createdAt])
+}
+
+model AnalyticsContentGenerated {
+  id         String   @id @default(cuid())
+  contentId  String
+  contentType String  // reel, story, carousel, post, ad, hook
+  cascadeId  String?
+  hookType   String?  // curiosidade, humor, shock, etc
+  metadata   Json?
+  generatedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([contentId])
+  @@index([cascadeId])
+  @@index([contentType])
+}
+
+model AnalyticsContentPublished {
+  id         String   @id @default(cuid())
+  contentId  String
+  platform   String   // instagram, tiktok, youtube, whatsapp, email
+  url        String?
+  publishedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([contentId])
+  @@index([platform])
+}
+
+model AnalyticsSyncLog {
+  id         String   @id @default(cuid())
+  status     String   @default("pending") // pending, synced, failed
+  batchSize  Int      @default(0)
+  lastSyncAt DateTime?
+  error      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

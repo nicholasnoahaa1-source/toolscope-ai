@@ -375,6 +375,7 @@
 
     <div class="controls">
       <button onclick="loadDashboard()">Atualizar Dashboard</button>
+      <button class="secondary" onclick="syncWithBackend()">📤 Sync Backend</button>
       <button class="secondary" onclick="exportData()">Exportar Dados</button>
     </div>
 
@@ -472,11 +473,33 @@
   </div>
 
   <script src="analytics-engine.js"></script>
+  <script src="backend-sync.js"></script>
   <script>
     let charts = {};
     let analyticsData = null;
+    let backendSync = null;
 
     async function loadDashboard() {
+      // Initialize backend sync (optional, for Phase 4)
+      backendSync = new BackendSyncEngine();
+
+      // Try to load from backend first
+      if (navigator.onLine) {
+        try {
+          const backendData = await backendSync.getAnalyticsSummary();
+          if (backendData.success && backendData.data.summary.totalMetrics > 0) {
+            console.log('✅ Loaded analytics from backend');
+            renderDashboardFromBackend(backendData.data);
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('status').classList.remove('loading');
+            document.getElementById('statusText').textContent = '✓ Dados sincronizados do backend';
+            return;
+          }
+        } catch (error) {
+          console.log('⚠️  Backend not available, using local IndexedDB:', error.message);
+        }
+      }
       const statusEl = document.getElementById('status');
       const statusText = document.getElementById('statusText');
       const dashboard = document.getElementById('dashboard');
@@ -653,6 +676,82 @@
           dateStyle: 'short',
           timeStyle: 'short'
         });
+    }
+
+    function renderDashboardFromBackend(backendData) {
+      const { metrics, generated, published, summary } = backendData;
+
+      if (!metrics || metrics.length === 0) return;
+
+      // Instantiate analytics engine with mock db to calculate patterns
+      const mockDb = { data: metrics };
+      const engine = new AnalyticsEngine(mockDb);
+
+      // Manual calculation from backend data
+      const hookGroups = {};
+      const formatGroups = {};
+
+      generated.forEach(g => {
+        const hook = engine.detectHookType(g.contentId);
+        if (!hookGroups[hook]) {
+          hookGroups[hook] = { hookType: hook, count: 0, totalOrders: 0, pieces: [] };
+        }
+        hookGroups[hook].count++;
+      });
+
+      metrics.forEach(m => {
+        const format = engine.detectContentType(m.contentId);
+        if (!formatGroups[format]) {
+          formatGroups[format] = { format, count: 0, totalViews: 0, totalOrders: 0, pieces: [] };
+        }
+        formatGroups[format].count += 1;
+        formatGroups[format].totalViews += m.views;
+        formatGroups[format].totalOrders += m.orders;
+      });
+
+      const hookPerf = Object.values(hookGroups).sort((a, b) => b.totalOrders - a.totalOrders);
+      const formatPerf = Object.values(formatGroups).sort((a, b) => b.totalOrders - a.totalOrders);
+
+      // Find top converters
+      const topConverters = metrics
+        .map(m => ({ ...m, conversionRate: (m.orders / Math.max(m.views, 1)) * 100 }))
+        .sort((a, b) => b.conversionRate - a.conversionRate)
+        .slice(0, 3)
+        .map(m => ({
+          contentId: m.contentId,
+          hook: engine.detectHookType(m.contentId),
+          format: engine.detectContentType(m.contentId),
+          conversionRate: m.conversionRate.toFixed(2),
+          views: m.views,
+          orders: m.orders
+        }));
+
+      const mockAnalyticsData = {
+        hookPerf,
+        formatPerf,
+        drivers: { topConverters, lowConverters: [] },
+        recommendations: [],
+        timestamp: new Date().toISOString()
+      };
+
+      renderDashboard(mockAnalyticsData);
+    }
+
+    async function syncWithBackend() {
+      if (!backendSync) backendSync = new BackendSyncEngine();
+
+      const statusEl = document.getElementById('statusText');
+      statusEl.textContent = '📤 Sincronizando com servidor...';
+
+      try {
+        const result = await backendSync.syncAllData();
+        statusEl.textContent = `✅ Sincronizado: ${result.synced} itens`;
+
+        // Reload dashboard after sync
+        setTimeout(() => loadDashboard(), 1000);
+      } catch (error) {
+        statusEl.textContent = `❌ Erro na sincronização: ${error.message}`;
+      }
     }
 
     function exportData() {
