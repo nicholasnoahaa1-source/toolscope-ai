@@ -17,6 +17,22 @@ import type { LifeSnapshot } from "./types";
  */
 const DATA_DIR = path.join(process.cwd(), "data");
 
+/** Snapshots gravados antes de um campo existir não devem derrubar a página. */
+function withDefaults(snapshot: LifeSnapshot): LifeSnapshot {
+  return {
+    ...snapshot,
+    agenda: snapshot.agenda ?? [],
+    week: snapshot.week ?? [],
+    history: snapshot.history ?? [],
+    projects: snapshot.projects ?? [],
+    tasks: snapshot.tasks ?? [],
+    inbox: snapshot.inbox ?? [],
+    notes: snapshot.notes ?? [],
+    files: snapshot.files ?? [],
+    connectors: snapshot.connectors ?? [],
+  };
+}
+
 async function readJsonFile(file: string): Promise<LifeSnapshot | null> {
   try {
     return JSON.parse(await readFile(path.join(DATA_DIR, file), "utf8")) as LifeSnapshot;
@@ -29,17 +45,17 @@ export async function getLifeSnapshot(): Promise<LifeSnapshot> {
   const raw = process.env.LIFE_SNAPSHOT_JSON;
   if (raw) {
     try {
-      return JSON.parse(raw) as LifeSnapshot;
+      return withDefaults(JSON.parse(raw) as LifeSnapshot);
     } catch {
       // JSON inválido na env: segue para os arquivos em vez de derrubar a página.
     }
   }
 
   const local = await readJsonFile("life-snapshot.local.json");
-  if (local) return local;
+  if (local) return withDefaults(local);
 
   const sample = await readJsonFile("life-snapshot.example.json");
-  if (sample) return { ...sample, isSample: true };
+  if (sample) return { ...withDefaults(sample), isSample: true };
 
   throw new Error(
     "Nenhum snapshot encontrado. Crie data/life-snapshot.local.json ou defina LIFE_SNAPSHOT_JSON.",

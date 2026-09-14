@@ -75,6 +75,20 @@ export interface FileRef {
   kind?: string;
 }
 
+export interface HistoryEntry {
+  title: string;
+  start: string;
+}
+
+export interface ProjectRef {
+  id: string;
+  title: string;
+  repo: string;
+  status: "draft" | "open" | "merged";
+  url: string;
+  updatedAt: string;
+}
+
 export interface LifeSnapshot {
   /** Quando este snapshot foi gerado (ISO 8601). */
   generatedAt: string;
@@ -84,7 +98,13 @@ export interface LifeSnapshot {
     timeZone: string;
   };
   connectors: Connector[];
+  /** Blocos de hoje. */
   agenda: AgendaEvent[];
+  /** Blocos dos próximos 7 dias, para a visão de semana. */
+  week: AgendaEvent[];
+  /** Blocos já ocorridos, usados para calcular sequências de hábitos. */
+  history: HistoryEntry[];
+  projects: ProjectRef[];
   tasks: Task[];
   inbox: InboxThread[];
   notes: NoteRef[];

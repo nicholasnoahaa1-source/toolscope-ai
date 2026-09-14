@@ -37,8 +37,20 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Painel da Vida (`/painel`)
 
-Uma página que reúne agenda, tarefas, e-mails não lidos, notas e arquivos
-recentes em um lugar só.
+Uma página que reúne a sua rotina em um lugar só:
+
+- **Hoje / Próximos 7 dias** — a agenda do dia com o bloco atual destacado, ou a
+  semana inteira com a carga de cada dia (`?v=semana`).
+- **Onde vai o seu dia** — quantas horas vão para escola, treino, deslocamento,
+  sono e refeições, calculadas a partir dos blocos da agenda.
+- **Hábitos** — sequência dos últimos 14 dias de academia, basquete e escola,
+  derivada do histórico da agenda.
+- **Tarefas, caixa de entrada, notas e arquivos** — Todoist, Gmail, Notion e Drive.
+- **Projetos** — pull requests abertos no GitHub.
+- **Ações rápidas** e o estado de cada conector.
+
+As métricas ficam em `src/lib/life/metrics.ts` e são todas derivadas: um snapshot
+novo atualiza os números sozinho, sem nada calculado à mão no JSON.
 
 ### Como os dados chegam aqui
 
