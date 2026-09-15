@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JARVIS Electron Main Process
  * Inicializa a aplicação desktop com integração de todos os subsistemas

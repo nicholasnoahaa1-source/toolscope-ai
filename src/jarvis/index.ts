@@ -4,11 +4,11 @@
  */
 
 // System Monitor
-export { SystemMetrics, ProcessInfo, AlertRule, SystemAlert } from './system-monitor';
+export type { SystemMetrics, ProcessInfo, AlertRule, SystemAlert } from './system-monitor';
 export { MetricsCollector, AlertManager, SystemMonitor } from './system-monitor';
 
 // Reflection Engine
-export { ReflectionInput, ReflectionOutput, LearnableInsight } from './reflection-engine';
+export type { ReflectionInput, ReflectionOutput, LearnableInsight } from './reflection-engine';
 export { ReflectionEngine } from './reflection-engine';
 
 // Desktop Interface
@@ -44,10 +44,8 @@ export type {
 export { DEFAULT_PRINCIPLES, DEFAULT_BEHAVIOR } from './jarvis-config';
 
 // Electron
-export { JARVISDesktopApp } from './electron-main';
-
-// Preload
-// (exported via contextBridge)
+// Note: electron-main.ts and preload.ts are excluded from Next.js build
+// They are compiled separately for the Electron main and preload processes
 
 /**
  * JARVIS - Quick Start Guide

@@ -291,7 +291,7 @@ export class AlertManager {
 export class SystemMonitor {
   private collector: MetricsCollector;
   private alertManager: AlertManager;
-  private monitoringInterval: NodeJS.Timer | null = null;
+  private monitoringInterval: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
 
   constructor() {

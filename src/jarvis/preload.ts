@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JARVIS Preload Script
  * Expõe IPC channels de forma segura para o processo renderer

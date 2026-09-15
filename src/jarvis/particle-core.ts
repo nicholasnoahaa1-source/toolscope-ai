@@ -58,19 +58,25 @@ export class ParticleCore {
     if (!AudioContext) return;
 
     this.audioContext = new AudioContext();
+    if (!this.audioContext) return;
+
     this.analyser = this.audioContext.createAnalyser();
+    if (!this.analyser) return;
+
     this.analyser.fftSize = 256;
 
     const bufferLength = this.analyser.frequencyBinCount;
     this.audioData = new Uint8Array(bufferLength);
 
     // Attempt to get user media for audio input
-    if (navigator.mediaDevices?.getUserMedia) {
+    if (navigator.mediaDevices?.getUserMedia && this.audioContext && this.analyser) {
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then(stream => {
-          const source = this.audioContext!.createMediaStreamSource(stream);
-          source.connect(this.analyser!);
+          if (this.audioContext && this.analyser) {
+            const source = this.audioContext.createMediaStreamSource(stream);
+            source.connect(this.analyser);
+          }
         })
         .catch(() => {
           console.warn('Microphone access denied');
@@ -105,7 +111,7 @@ export class ParticleCore {
 
     let audioLevel = 0;
     if (this.audioReactive && this.analyser && this.audioData) {
-      this.analyser.getByteFrequencyData(this.audioData);
+      this.analyser.getByteFrequencyData(this.audioData as any);
       audioLevel = this.audioData.reduce((a, b) => a + b) / this.audioData.length / 255;
     }
 
